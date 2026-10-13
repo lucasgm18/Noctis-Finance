@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, ArrowUpRight, ArrowDownRight, Lock, CheckCircle2, Sliders } from 'lucide-react';
+import { Bell, ArrowUpRight, ArrowDownRight, Lock, CheckCircle2, Settings as SettingsIcon, Sun, Moon } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { formatCurrency } from '../utils/formatters';
 import { NoctisLogo } from './NoctisLogo';
@@ -17,15 +17,17 @@ export const Header: React.FC = () => {
     lockApp,
     settings,
     setActiveTab,
+    theme,
+    toggleTheme,
   } = useFinance();
 
   // Saídas totais comprometidas no mês
   const totalCommittedExpenses = totalPaidExpenses + totalPendingExpenses;
 
   return (
-    <header className="bg-[#6E44FF] text-white pt-12 sm:pt-6 pb-9 px-4 sm:px-8 transition-all relative overflow-hidden">
+    <header className="bg-[#6E44FF] dark:bg-[#150F28] text-white pt-12 sm:pt-6 pb-9 px-4 sm:px-8 transition-colors duration-300 relative overflow-hidden border-b border-transparent dark:border-[#322653]">
       {/* Subtle light glow behind header */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 dark:bg-[#7C5CFF]/15 rounded-full blur-3xl pointer-events-none" />
 
       {/* Top Bar: User Greeting + Actions */}
       <div className="flex items-center justify-between mb-6 relative z-10">
@@ -33,7 +35,7 @@ export const Header: React.FC = () => {
           <NoctisLogo className="w-11 h-11 rounded-2xl shadow-md border border-white/20 shrink-0" />
           <div className="min-w-0">
             <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-              <span className="text-[11px] uppercase tracking-wider text-[#E5DEFF] font-bold">Noctis Finanças</span>
+              <span className="text-[11px] uppercase tracking-wider text-[#E5DEFF] dark:text-[#A69BB8] font-bold">Noctis</span>
               <SyncBadge variant="header" />
             </div>
             <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-white truncate">
@@ -42,35 +44,48 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Action Buttons: Lock, Theme, Settings Gear, Bell */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Quick Lock Button */}
           <button
             onClick={lockApp}
-            title="Bloquear aplicativo (Biometria)"
-            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md flex items-center justify-center transition-all border border-white/20 active:scale-95 shadow-sm"
+            title="Bloquear aplicativo"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 backdrop-blur-md flex items-center justify-center transition-all border border-white/20 shadow-sm"
           >
             <Lock className="w-4 h-4 text-[#E5DEFF]" />
           </button>
 
-          {/* Settings Shortcut */}
+          {/* Theme Toggle Button (Sol/Lua) */}
+          <button
+            onClick={toggleTheme}
+            title={theme === 'dark' ? 'Tema Claro' : 'Tema Escuro (Noctis)'}
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 backdrop-blur-md flex items-center justify-center transition-all border border-white/20 shadow-sm"
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-4 h-4 text-[#FEF3C7]" />
+            ) : (
+              <Moon className="w-4 h-4 text-[#E5DEFF]" />
+            )}
+          </button>
+
+          {/* Settings Shortcut Gear Icon */}
           <button
             onClick={() => setActiveTab('settings')}
-            title="Configurações & Notificações"
-            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md flex items-center justify-center transition-all border border-white/20 active:scale-95 shadow-sm"
+            title="Configurações"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 backdrop-blur-md flex items-center justify-center transition-all border border-white/20 shadow-sm"
           >
-            <Sliders className="w-4 h-4 text-[#E5DEFF]" />
+            <SettingsIcon className="w-4 h-4 text-[#E5DEFF]" />
           </button>
 
           {/* Notifications Bell */}
           <button
             onClick={() => setIsNotificationOpen(true)}
-            title="Central de Notificações"
-            className="relative w-10 h-10 rounded-full bg-white/95 hover:bg-white backdrop-blur-md text-[#231942] flex items-center justify-center transition-all active:scale-90 shadow-md hover:shadow-lg"
+            title="Alertas & Notificações"
+            className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/95 hover:bg-white active:scale-90 backdrop-blur-md text-[#231942] flex items-center justify-center transition-all shadow-md hover:shadow-lg"
           >
-            <Bell className="w-5 h-5 text-[#231942]" />
+            <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-[#231942]" />
             {unreadNotificationsCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 bg-[#E0533C] text-white text-[11px] font-bold rounded-full flex items-center justify-center border-2 border-[#6E44FF]">
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#E0533C] text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-[#6E44FF]">
                 {unreadNotificationsCount}
               </span>
             )}

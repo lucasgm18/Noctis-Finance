@@ -140,31 +140,32 @@ export const TransactionsView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Header & Search Bar */}
-      <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] space-y-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:pointer-events-none">
+      <div className="bg-[#FCF9F2]/75 dark:bg-[#1A142D]/80 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 dark:border-[#322653] shadow-[0_8px_30px_rgb(35,25,66,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)] space-y-4 relative overflow-hidden transition-all duration-300">
         <div className={`flex ${isMobile ? 'flex-col items-start' : 'flex-col sm:flex-row items-start sm:items-center'} justify-between gap-4`}>
           <div>
-            <h2 className="text-xl font-extrabold text-[#231942]">Extrato Completo</h2>
-            <p className="text-xs text-[#655A7C]">Navegue e filtre lançamentos organizados por mês</p>
+            <h2 className="text-xl font-black tracking-tight text-[#231942] dark:text-[#F7F2E7]">Extrato</h2>
           </div>
 
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="py-2.5 px-4 rounded-2xl bg-[#6E44FF] hover:bg-[#5A32E6] text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition-all active:scale-95"
+            className={`py-2.5 px-4 rounded-2xl bg-[#6E44FF] hover:bg-[#5A32E6] dark:bg-[#7C5CFF] dark:hover:bg-[#6E44FF] text-white text-xs font-bold shadow-md flex items-center justify-center gap-1.5 transition-all active:scale-95 ${
+              isMobile ? 'w-full' : ''
+            }`}
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
-            <span>Novo Lançamento</span>
+            <span>+ Novo Lançamento</span>
           </button>
         </div>
 
         {/* Barra Seletora de Mês/Ano */}
         <div className="pt-2">
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar scrollbar-none">
             <button
               onClick={() => setSelectedMonthKey('all')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition-all active:scale-95 ${
                 selectedMonthKey === 'all'
-                  ? 'bg-[#6E44FF] text-white shadow-md'
-                  : 'bg-[#EDE5D5]/80 text-[#655A7C] hover:text-[#231942] hover:bg-[#DFD5C3]'
+                  ? 'bg-[#6E44FF] dark:bg-[#7C5CFF] text-white shadow-md'
+                  : 'bg-[#EDE5D5]/80 dark:bg-[#241C3D] text-[#655A7C] dark:text-[#A69BB8] hover:text-[#231942] dark:hover:text-[#F7F2E7] hover:bg-[#DFD5C3] dark:hover:bg-[#322653]'
               }`}
             >
               Todos os Meses
@@ -175,8 +176,8 @@ export const TransactionsView: React.FC = () => {
                 onClick={() => setSelectedMonthKey(m.key)}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition-all active:scale-95 ${
                   selectedMonthKey === m.key
-                    ? 'bg-[#6E44FF] text-white shadow-md'
-                    : 'bg-[#EDE5D5]/80 text-[#655A7C] hover:text-[#231942] hover:bg-[#DFD5C3]'
+                    ? 'bg-[#6E44FF] dark:bg-[#7C5CFF] text-white shadow-md'
+                    : 'bg-[#EDE5D5]/80 dark:bg-[#241C3D] text-[#655A7C] dark:text-[#A69BB8] hover:text-[#231942] dark:hover:text-[#F7F2E7] hover:bg-[#DFD5C3] dark:hover:bg-[#322653]'
                 }`}
               >
                 {m.label}
@@ -189,13 +190,13 @@ export const TransactionsView: React.FC = () => {
         <div className={`flex ${isMobile ? 'flex-col' : 'flex-col sm:flex-row'} gap-3 pt-1`}>
           {/* Search Input */}
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-[#655A7C] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#655A7C] dark:text-[#A69BB8] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Buscar por descrição ou anotação..."
+              placeholder="Buscar por descrição..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white/90 border border-[#DFD5C3] text-xs font-semibold text-[#231942] focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+              className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white/90 dark:bg-[#241C3D] border border-[#DFD5C3] dark:border-[#322653] text-xs font-semibold text-[#231942] dark:text-[#F7F2E7] placeholder:text-[#655A7C]/60 dark:placeholder:text-[#A69BB8]/40 focus:outline-none focus:ring-2 focus:ring-[#6E44FF] dark:focus:ring-[#7C5CFF]"
             />
           </div>
 
@@ -203,7 +204,7 @@ export const TransactionsView: React.FC = () => {
           <select
             value={filterPillar}
             onChange={e => setFilterPillar(e.target.value)}
-            className="px-3 py-2.5 rounded-2xl bg-white/90 border border-[#DFD5C3] text-xs font-bold text-[#231942] focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+            className="px-3 py-2.5 rounded-2xl bg-white/90 dark:bg-[#241C3D] border border-[#DFD5C3] dark:border-[#322653] text-xs font-bold text-[#231942] dark:text-[#F7F2E7] focus:outline-none focus:ring-2 focus:ring-[#6E44FF] dark:focus:ring-[#7C5CFF]"
           >
             <option value="all">Todos os Pilares</option>
             {pillars.map(p => (
@@ -216,18 +217,18 @@ export const TransactionsView: React.FC = () => {
         <div className="flex flex-wrap gap-1.5 pt-1">
           {[
             { id: 'all', label: 'Todos' },
-            { id: 'pending', label: 'A Vencer (Pendentes)' },
+            { id: 'pending', label: 'A Vencer' },
             { id: 'expense', label: 'Saídas' },
             { id: 'income', label: 'Entradas' },
-            { id: 'savings', label: 'Reserva & Guardar' },
+            { id: 'savings', label: 'Guardado' },
           ].map(btn => (
             <button
               key={btn.id}
               onClick={() => setFilterType(btn.id as any)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95 ${
                 filterType === btn.id
-                  ? 'bg-[#231942] text-white shadow-sm'
-                  : 'bg-[#EDE5D5]/80 text-[#655A7C] hover:text-[#231942] hover:bg-[#DFD5C3]'
+                  ? 'bg-[#231942] dark:bg-[#7C5CFF] text-white shadow-sm'
+                  : 'bg-[#EDE5D5]/80 dark:bg-[#241C3D] text-[#655A7C] dark:text-[#A69BB8] hover:text-[#231942] dark:hover:text-[#F7F2E7] hover:bg-[#DFD5C3] dark:hover:bg-[#322653]'
               }`}
             >
               {btn.label}
@@ -238,20 +239,20 @@ export const TransactionsView: React.FC = () => {
 
       {/* Lista Agrupada por Mês com Cabeçalhos Mensais */}
       {groupedByMonth.length === 0 ? (
-        <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-8 sm:p-12 rounded-[28px] border border-white/70 text-center shadow-[0_8px_30px_rgb(35,25,66,0.05)] relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:pointer-events-none">
-          <div className="w-14 h-14 rounded-full bg-[#E5DEFF] text-[#6E44FF] flex items-center justify-center mx-auto mb-3 shadow-sm">
+        <div className="bg-[#FCF9F2]/75 dark:bg-[#1A142D]/80 backdrop-blur-xl p-8 sm:p-12 rounded-[28px] border border-white/70 dark:border-[#322653] text-center shadow-[0_8px_30px_rgb(35,25,66,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)] relative overflow-hidden">
+          <div className="w-14 h-14 rounded-full bg-[#E5DEFF] dark:bg-[#6E44FF]/20 text-[#6E44FF] dark:text-[#7C5CFF] flex items-center justify-center mx-auto mb-3 shadow-sm">
             <Layers className="w-7 h-7" />
           </div>
-          <h3 className="text-base font-bold text-[#231942]">Nenhum lançamento registrado</h3>
-          <p className="text-xs text-[#655A7C] max-w-sm mx-auto mt-1 mb-5">
-            Seu extrato está limpo. Comece adicionando suas receitas ou contas para organizar sua carteira.
+          <h3 className="text-base font-black text-[#231942] dark:text-[#F7F2E7]">Nenhum lançamento registrado</h3>
+          <p className="text-xs font-semibold text-[#655A7C] dark:text-[#A69BB8] max-w-sm mx-auto mt-1 mb-5">
+            Seu extrato está limpo. Comece adicionando receitas ou despesas.
           </p>
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="py-2.5 px-5 rounded-2xl bg-[#6E44FF] hover:bg-[#5A32E6] text-white text-xs font-bold shadow-md inline-flex items-center gap-2 transition-all active:scale-95 hover:shadow-lg hover:-translate-y-0.5"
+            className="py-2.5 px-5 rounded-2xl bg-[#6E44FF] hover:bg-[#5A32E6] dark:bg-[#7C5CFF] dark:hover:bg-[#6E44FF] text-white text-xs font-bold shadow-md inline-flex items-center gap-2 transition-all active:scale-95 hover:shadow-lg"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
-            <span>Adicionar Primeiro Lançamento</span>
+            <span>Adicionar Lançamento</span>
           </button>
         </div>
       ) : (
@@ -259,15 +260,15 @@ export const TransactionsView: React.FC = () => {
           {groupedByMonth.map(group => (
             <div
               key={group.key}
-              className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] space-y-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:pointer-events-none"
+              className="bg-[#FCF9F2]/75 dark:bg-[#1A142D]/80 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 dark:border-[#322653] shadow-[0_8px_30px_rgb(35,25,66,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)] space-y-4 relative overflow-hidden transition-all duration-300"
             >
               {/* Cabeçalho Mensal com Resumo Financeiro do Mês */}
-              <div className={`flex ${isMobile ? 'flex-col items-start' : 'flex-col sm:flex-row items-start sm:items-center'} justify-between gap-3 pb-3 border-b border-[#DFD5C3]/70`}>
+              <div className={`flex ${isMobile ? 'flex-col items-start' : 'flex-col sm:flex-row items-start sm:items-center'} justify-between gap-3 pb-3 border-b border-[#DFD5C3]/70 dark:border-[#322653]`}>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-[#231942] flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-[#6E44FF]" />
+                  <h3 className="text-base sm:text-lg font-black text-[#231942] dark:text-[#F7F2E7] flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-[#6E44FF] dark:text-[#7C5CFF]" />
                     <span>{group.label}</span>
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#EDE5D5] text-[#655A7C]">
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#EDE5D5] dark:bg-[#241C3D] text-[#655A7C] dark:text-[#A69BB8]">
                       {group.items.length} itens
                     </span>
                   </h3>
@@ -275,15 +276,15 @@ export const TransactionsView: React.FC = () => {
 
                 {/* Resumo do Mês: Entradas, Saídas e Saldo */}
                 <div className="flex items-center gap-3 text-xs font-bold flex-wrap">
-                  <div className="flex items-center gap-1 text-[#1F9D73] bg-[#E1F7EF] px-2.5 py-1 rounded-xl">
+                  <div className="flex items-center gap-1 text-[#1F9D73] dark:text-[#34D399] bg-[#E1F7EF] dark:bg-[#1F9D73]/20 px-2.5 py-1 rounded-xl">
                     <ArrowUpRight className="w-3.5 h-3.5" />
                     <span>+{formatCurrency(group.monthIncome)}</span>
                   </div>
-                  <div className="flex items-center gap-1 text-[#E0533C] bg-[#FDE8E5] px-2.5 py-1 rounded-xl">
+                  <div className="flex items-center gap-1 text-[#E0533C] dark:text-[#F87171] bg-[#FDE8E5] dark:bg-[#E0533C]/20 px-2.5 py-1 rounded-xl">
                     <ArrowDownRight className="w-3.5 h-3.5" />
                     <span>-{formatCurrency(group.monthExpense)}</span>
                   </div>
-                  <div className="flex items-center gap-1 text-[#6E44FF] bg-[#E5DEFF] px-2.5 py-1 rounded-xl">
+                  <div className="flex items-center gap-1 text-[#6E44FF] dark:text-[#A78BFA] bg-[#E5DEFF] dark:bg-[#6E44FF]/20 px-2.5 py-1 rounded-xl">
                     <Wallet className="w-3.5 h-3.5" />
                     <span>Saldo: {formatCurrency(group.monthBalance)}</span>
                   </div>
@@ -302,7 +303,7 @@ export const TransactionsView: React.FC = () => {
                   return (
                     <div
                       key={tx.id}
-                      className={`flex ${isMobile ? 'flex-col items-start' : 'flex-col sm:flex-row items-start sm:items-center'} justify-between p-3.5 rounded-2xl bg-white/75 backdrop-blur-md hover:bg-white border border-[#DFD5C3]/70 hover:border-[#6E44FF]/40 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] gap-3 transition-all duration-200`}
+                      className={`flex ${isMobile ? 'flex-col items-start' : 'flex-col sm:flex-row items-start sm:items-center'} justify-between p-3.5 rounded-2xl bg-white/75 dark:bg-[#241C3D]/80 backdrop-blur-md hover:bg-white dark:hover:bg-[#2b2248] border border-[#DFD5C3]/70 dark:border-[#322653] hover:border-[#6E44FF]/40 dark:hover:border-[#7C5CFF]/60 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] gap-3 transition-all duration-200`}
                     >
                       {/* Left: Icon & Info */}
                       <div className="flex items-center gap-3 min-w-0">
@@ -318,20 +319,20 @@ export const TransactionsView: React.FC = () => {
 
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="font-bold text-[#231942] text-sm truncate">{tx.title}</h4>
+                            <h4 className="font-bold text-[#231942] dark:text-[#F7F2E7] text-sm truncate">{tx.title}</h4>
                             {tx.recurrence === 'installment' && tx.currentInstallment && (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E5DEFF] text-[#6E44FF]">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E5DEFF] dark:bg-[#6E44FF]/25 text-[#6E44FF] dark:text-[#A78BFA]">
                                 {tx.currentInstallment}/{tx.totalInstallments}
                               </span>
                             )}
                             {tx.recurrence === 'fixed_monthly' && (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EDE5D5] text-[#655A7C]">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EDE5D5] dark:bg-[#322653] text-[#655A7C] dark:text-[#A69BB8]">
                                 Fixo
                               </span>
                             )}
                           </div>
 
-                          <div className="flex items-center gap-2 text-xs text-[#655A7C] mt-0.5 flex-wrap">
+                          <div className="flex items-center gap-2 text-xs font-semibold text-[#655A7C] dark:text-[#A69BB8] mt-0.5 flex-wrap">
                             <span>{sub?.name || (isIncome ? 'Entrada' : pillar?.shortName)}</span>
                             <span>•</span>
                             <span className="flex items-center gap-1">
@@ -349,7 +350,7 @@ export const TransactionsView: React.FC = () => {
                       </div>
 
                       {/* Right: Amounts & Actions */}
-                      <div className={`flex items-center justify-between ${isMobile ? '' : 'sm:justify-end'} gap-3 w-full ${isMobile ? '' : 'sm:w-auto'} pt-2.5 ${isMobile ? '' : 'sm:pt-0'} border-t ${isMobile ? '' : 'sm:border-t-0'} border-[#DFD5C3]/60`}>
+                      <div className={`flex items-center justify-between ${isMobile ? '' : 'sm:justify-end'} gap-3 w-full ${isMobile ? '' : 'sm:w-auto'} pt-2.5 ${isMobile ? '' : 'sm:pt-0'} border-t ${isMobile ? '' : 'sm:border-t-0'} border-[#DFD5C3]/60 dark:border-[#322653]`}>
                         {!isIncome && (
                           <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${due.bg} ${due.color}`}>
                             {due.text}
@@ -357,8 +358,8 @@ export const TransactionsView: React.FC = () => {
                         )}
 
                         <div className="text-right">
-                          <div className={`font-extrabold text-sm sm:text-base ${
-                            isIncome ? 'text-[#1F9D73]' : isSavings ? 'text-[#835FFF]' : 'text-[#E0533C]'
+                          <div className={`font-black text-sm sm:text-base ${
+                            isIncome ? 'text-[#1F9D73] dark:text-[#34D399]' : isSavings ? 'text-[#835FFF] dark:text-[#A78BFA]' : 'text-[#E0533C] dark:text-[#F87171]'
                           }`}>
                             {isIncome ? '+' : '-'}{formatCurrency(tx.amount)}
                           </div>
@@ -370,7 +371,7 @@ export const TransactionsView: React.FC = () => {
                               onClick={() => togglePaid(tx.id)}
                               className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 active:scale-95 ${
                                 tx.paid
-                                  ? 'bg-[#E1F7EF] text-[#1F9D73]'
+                                  ? 'bg-[#E1F7EF] text-[#1F9D73] dark:bg-[#1F9D73]/20 dark:text-[#34D399]'
                                   : 'bg-[#1F9D73] text-white hover:bg-[#18805D] shadow-sm'
                               }`}
                               title={tx.paid ? 'Marcar como não pago' : 'Dar baixa / Pago'}
@@ -386,7 +387,7 @@ export const TransactionsView: React.FC = () => {
                                 deleteTransaction(tx.id);
                               }
                             }}
-                            className="p-1.5 rounded-xl text-[#655A7C] hover:text-[#E0533C] hover:bg-[#FDE8E5] transition-colors active:scale-95"
+                            className="p-1.5 rounded-xl text-[#655A7C] dark:text-[#A69BB8] hover:text-[#E0533C] dark:hover:text-[#F87171] hover:bg-[#FDE8E5] dark:hover:bg-[#E0533C]/20 transition-colors active:scale-95"
                             title="Excluir"
                           >
                             <Trash2 className="w-4 h-4" />

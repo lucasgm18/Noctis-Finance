@@ -47,34 +47,34 @@ export const AnalysisView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Switcher: Gráficos vs Calendário de Vencimentos */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[#FCF9F2]/75 backdrop-blur-xl p-4 rounded-[24px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] transition-all duration-300">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[#FCF9F2]/75 dark:bg-[#1A142D]/80 backdrop-blur-xl p-4 sm:p-5 rounded-[24px] border border-white/70 dark:border-[#322653] shadow-[0_8px_30px_rgb(35,25,66,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-all duration-300">
         <div>
-          <h2 className="text-xl font-extrabold text-[#231942]">Análise & Vencimentos</h2>
-          <p className="text-xs text-[#655A7C]">Visão gráfica dos 5 Pilares e cronograma financeiro</p>
+          <h2 className="text-xl font-black tracking-tight text-[#231942] dark:text-[#F7F2E7]">Análise</h2>
         </div>
 
-        <div className="flex bg-[#EDE5D5]/80 backdrop-blur-sm p-1 rounded-full border border-[#DFD5C3]">
+        {/* Inner Tabs Selector - 100% width grid-cols-2 on mobile */}
+        <div className="grid grid-cols-2 sm:flex w-full sm:w-auto bg-[#EDE5D5]/80 dark:bg-[#241C3D] backdrop-blur-sm p-1 rounded-full border border-[#DFD5C3] dark:border-[#3B2D63]">
           <button
             onClick={() => setActiveSubTab('charts')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full transition-all duration-200 active:scale-95 ${
+            className={`flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold rounded-full transition-all duration-200 active:scale-95 ${
               activeSubTab === 'charts'
-                ? 'bg-[#6E44FF] text-white shadow-md'
-                : 'text-[#655A7C] hover:text-[#231942]'
+                ? 'bg-[#6E44FF] dark:bg-[#7C5CFF] text-white shadow-md'
+                : 'text-[#655A7C] dark:text-[#A69BB8] hover:text-[#231942] dark:hover:text-white'
             }`}
           >
             <BarChart3 className="w-4 h-4" />
-            <span>Gráficos & Distribuição</span>
+            <span>Gráficos</span>
           </button>
           <button
             onClick={() => setActiveSubTab('calendar')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full transition-all duration-200 active:scale-95 ${
+            className={`flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold rounded-full transition-all duration-200 active:scale-95 ${
               activeSubTab === 'calendar'
-                ? 'bg-[#6E44FF] text-white shadow-md'
-                : 'text-[#655A7C] hover:text-[#231942]'
+                ? 'bg-[#6E44FF] dark:bg-[#7C5CFF] text-white shadow-md'
+                : 'text-[#655A7C] dark:text-[#A69BB8] hover:text-[#231942] dark:hover:text-white'
             }`}
           >
             <CalendarIcon className="w-4 h-4" />
-            <span>Calendário de Vencimentos</span>
+            <span>Calendário</span>
           </button>
         </div>
       </div>
@@ -84,13 +84,12 @@ export const AnalysisView: React.FC = () => {
       ) : (
         <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'} gap-6`}>
           {/* Card 1: Gráfico de Rosca dos 5 Pilares */}
-          <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] hover:border-[#6E44FF]/40 hover:shadow-[0_14px_34px_rgba(110,68,255,0.12)] transition-all duration-300 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:via-transparent before:to-[#6E44FF]/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:pointer-events-none flex flex-col justify-between">
+          <div className="bg-[#FCF9F2]/75 dark:bg-[#1A142D]/80 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 dark:border-[#322653] shadow-[0_8px_30px_rgb(35,25,66,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)] hover:border-[#6E44FF]/40 dark:hover:border-[#7C5CFF]/60 hover:shadow-[0_14px_34px_rgba(110,68,255,0.12)] transition-all duration-300 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:via-transparent before:to-[#6E44FF]/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:pointer-events-none flex flex-col justify-between">
             <div className="mb-3 relative z-10">
-              <h3 className="text-base font-bold text-[#231942] flex items-center gap-2">
-                <Layers className="w-4 h-4 text-[#6E44FF]" />
-                <span>Distribuição pelos 5 Pilares Macro</span>
+              <h3 className="text-base font-extrabold tracking-tight text-[#231942] dark:text-[#F7F2E7] flex items-center gap-2">
+                <Layers className="w-4 h-4 text-[#6E44FF] dark:text-[#7C5CFF]" />
+                <span>Distribuição pelos 5 Pilares</span>
               </h3>
-              <p className="text-xs text-[#655A7C]">Passe o mouse ou toque nas fatias para detalhar</p>
             </div>
 
             {/* Donut Chart Container */}
@@ -150,13 +149,13 @@ export const AnalysisView: React.FC = () => {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center text-center">
-                    <span className="text-[11px] font-bold text-[#655A7C] uppercase tracking-wider">
+                    <span className="text-[11px] font-bold text-[#655A7C] dark:text-[#A69BB8] uppercase tracking-wider">
                       {totalCommitted > 0 ? 'Total Comprometido' : 'Sem Despesas'}
                     </span>
-                    <span className="text-base sm:text-xl font-black text-[#231942]">
+                    <span className="text-base sm:text-xl font-black text-[#231942] dark:text-[#F7F2E7] tracking-tight">
                       {formatCurrency(totalCommitted)}
                     </span>
-                    <span className="text-[10px] text-[#655A7C] font-semibold mt-0.5">
+                    <span className="text-[10px] text-[#655A7C] dark:text-[#A69BB8] font-semibold mt-0.5">
                       {totalCommitted > 0 ? 'Passe o mouse na fatia' : 'R$ 0,00 registrado'}
                     </span>
                   </div>
@@ -166,18 +165,18 @@ export const AnalysisView: React.FC = () => {
 
             {/* Custom Legend for 5 Pillars or Empty state */}
             {donutData.length === 0 ? (
-              <div className="py-4 text-center border-t border-[#DFD5C3]/60 relative z-10">
-                <p className="text-xs text-[#655A7C]">Nenhum gasto registrado para gerar a distribuição dos pilares.</p>
+              <div className="py-4 text-center border-t border-[#DFD5C3]/60 dark:border-[#322653] relative z-10">
+                <p className="text-xs text-[#655A7C] dark:text-[#A69BB8]">Nenhum gasto registrado para gerar a distribuição dos pilares.</p>
                 <button
                   onClick={() => setIsAddModalOpen(true)}
-                  className="mt-2 text-xs font-bold text-[#6E44FF] hover:underline inline-flex items-center gap-1 active:scale-95 transition-all"
+                  className="mt-2 text-xs font-bold text-[#6E44FF] dark:text-[#7C5CFF] hover:underline inline-flex items-center gap-1 active:scale-95 transition-all"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Cadastrar primeiro lançamento</span>
                 </button>
               </div>
             ) : (
-              <div className="space-y-1.5 mt-2 pt-3 border-t border-[#DFD5C3]/60 relative z-10">
+              <div className="space-y-1.5 mt-2 pt-3 border-t border-[#DFD5C3]/60 dark:border-[#322653] relative z-10">
                 {donutData.map(item => {
                   const pct = totalCommitted > 0 ? Math.round((item.value / totalCommitted) * 100) : 0;
                   return (
@@ -185,15 +184,15 @@ export const AnalysisView: React.FC = () => {
                       key={item.id}
                       onMouseEnter={() => setHoveredPillar(item)}
                       onMouseLeave={() => setHoveredPillar(null)}
-                      className="flex items-center justify-between p-2 rounded-xl hover:bg-white/70 transition-colors cursor-pointer active:scale-[0.99]"
+                      className="flex items-center justify-between p-2 rounded-xl hover:bg-white/70 dark:hover:bg-[#241C3D] transition-colors cursor-pointer active:scale-[0.99]"
                     >
                       <div className="flex items-center gap-2.5">
                         <span className="w-3 h-3 rounded-full shrink-0 shadow-sm" style={{ backgroundColor: item.color }} />
-                        <span className="text-xs font-bold text-[#231942]">{item.name}</span>
+                        <span className="text-xs font-bold text-[#231942] dark:text-[#F7F2E7]">{item.name}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-xs font-bold text-[#231942]">{formatCurrency(item.value)}</span>
-                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#EDE5D5]/80 text-[#655A7C] min-w-[42px] text-center">
+                        <span className="text-xs font-bold text-[#231942] dark:text-[#F7F2E7]">{formatCurrency(item.value)}</span>
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#EDE5D5]/80 dark:bg-[#241C3D] text-[#655A7C] dark:text-[#A69BB8] min-w-[42px] text-center border border-transparent dark:border-[#3B2D63]">
                           {pct}%
                         </span>
                       </div>
@@ -205,30 +204,29 @@ export const AnalysisView: React.FC = () => {
           </div>
 
           {/* Card 2: Comparativo Mensal Entradas vs Saídas */}
-          <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] hover:border-[#6E44FF]/40 hover:shadow-[0_14px_34px_rgba(110,68,255,0.12)] transition-all duration-300 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:via-transparent before:to-[#6E44FF]/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:pointer-events-none flex flex-col justify-between">
+          <div className="bg-[#FCF9F2]/75 dark:bg-[#1A142D]/80 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 dark:border-[#322653] shadow-[0_8px_30px_rgb(35,25,66,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)] hover:border-[#6E44FF]/40 dark:hover:border-[#7C5CFF]/60 hover:shadow-[0_14px_34px_rgba(110,68,255,0.12)] transition-all duration-300 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:via-transparent before:to-[#6E44FF]/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:pointer-events-none flex flex-col justify-between">
             <div className="relative z-10">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-3">
                 <div>
-                  <h3 className="text-base font-bold text-[#231942]">Entradas vs Saídas por Mês</h3>
-                  <p className="text-xs text-[#655A7C]">Histórico de fluxo de caixa</p>
+                  <h3 className="text-base font-extrabold tracking-tight text-[#231942] dark:text-[#F7F2E7]">Entradas vs Saídas por Mês</h3>
                 </div>
               </div>
 
               {/* Mini Summary badges */}
               <div className="grid grid-cols-2 gap-3 mb-4 mt-2">
-                <div className="p-3 rounded-2xl bg-[#E1F7EF]/80 backdrop-blur-sm border border-[#1F9D73]/25 flex items-center justify-between shadow-sm">
+                <div className="p-3 rounded-2xl bg-[#E1F7EF]/80 dark:bg-[#1F9D73]/15 backdrop-blur-sm border border-[#1F9D73]/25 dark:border-[#1F9D73]/40 flex items-center justify-between shadow-sm">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#1F9D73]">
                     <ArrowUpRight className="w-4 h-4" />
-                    <span>Entradas Totais</span>
+                    <span>Entradas</span>
                   </div>
-                  <span className="text-xs font-extrabold text-[#1F9D73] whitespace-nowrap">{formatCurrency(totalIncome)}</span>
+                  <span className="text-xs font-black text-[#1F9D73] whitespace-nowrap">{formatCurrency(totalIncome)}</span>
                 </div>
-                <div className="p-3 rounded-2xl bg-[#FDE8E5]/80 backdrop-blur-sm border border-[#E0533C]/25 flex items-center justify-between shadow-sm">
+                <div className="p-3 rounded-2xl bg-[#FDE8E5]/80 dark:bg-[#E0533C]/15 backdrop-blur-sm border border-[#E0533C]/25 dark:border-[#E0533C]/40 flex items-center justify-between shadow-sm">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#E0533C]">
                     <ArrowDownRight className="w-4 h-4" />
-                    <span>Saídas Totais</span>
+                    <span>Saídas</span>
                   </div>
-                  <span className="text-xs font-extrabold text-[#E0533C] whitespace-nowrap">{formatCurrency(totalPaidExpenses)}</span>
+                  <span className="text-xs font-black text-[#E0533C] whitespace-nowrap">{formatCurrency(totalPaidExpenses)}</span>
                 </div>
               </div>
             </div>

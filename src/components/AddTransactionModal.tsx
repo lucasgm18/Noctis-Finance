@@ -98,17 +98,16 @@ export const AddTransactionModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#231942]/65 backdrop-blur-md overflow-y-auto">
-      <div className="bg-[#FCF9F2]/95 backdrop-blur-2xl w-full max-w-lg rounded-[32px] border border-white/80 shadow-[0_20px_60px_rgba(35,25,66,0.3)] p-6 sm:p-7 relative my-8 animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F0B1A]/70 backdrop-blur-md overflow-y-auto">
+      <div className="bg-[#FCF9F2]/95 dark:bg-[#1A142D]/95 backdrop-blur-2xl w-full max-w-lg rounded-[32px] border border-white/80 dark:border-[#322653] shadow-[0_20px_60px_rgba(0,0,0,0.5)] p-6 sm:p-7 relative my-8 animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-[#DFD5C3]">
+        <div className="flex items-center justify-between pb-4 border-b border-[#DFD5C3] dark:border-[#322653]">
           <div>
-            <h3 className="text-xl font-extrabold text-[#231942]">Novo Lançamento</h3>
-            <p className="text-xs text-[#655A7C]">Registre despesas, contas agendadas ou reservas</p>
+            <h3 className="text-xl font-black text-[#231942] dark:text-[#F7F2E7]">Novo Lançamento</h3>
           </div>
           <button
             onClick={() => setIsAddModalOpen(false)}
-            className="w-9 h-9 rounded-full bg-[#EDE5D5] text-[#231942] hover:bg-[#DFD5C3] flex items-center justify-center transition-colors"
+            className="w-9 h-9 rounded-full bg-[#EDE5D5] dark:bg-[#241C3D] text-[#231942] dark:text-[#F7F2E7] hover:bg-[#DFD5C3] dark:hover:bg-[#322653] flex items-center justify-center transition-colors active:scale-95"
           >
             <X className="w-5 h-5" />
           </button>
@@ -117,7 +116,7 @@ export const AddTransactionModal: React.FC = () => {
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           {/* Tipo de Transação: Entrada, Saída, Guardar/Reserva */}
           <div>
-            <label className="block text-xs font-bold text-[#655A7C] uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-[#655A7C] dark:text-[#A69BB8] uppercase tracking-wider mb-2">
               Tipo de Movimentação
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -127,7 +126,7 @@ export const AddTransactionModal: React.FC = () => {
                 className={`py-2.5 px-3 rounded-2xl text-xs font-bold transition-all border ${
                   type === 'expense'
                     ? 'bg-[#E0533C] text-white border-[#E0533C] shadow-md'
-                    : 'bg-[#EDE5D5] text-[#231942] border-[#DFD5C3] hover:bg-[#DFD5C3]'
+                    : 'bg-[#EDE5D5] dark:bg-[#241C3D] text-[#231942] dark:text-[#F7F2E7] border-[#DFD5C3] dark:border-[#322653] hover:bg-[#DFD5C3]'
                 }`}
               >
                 Saída / Despesa
@@ -138,7 +137,7 @@ export const AddTransactionModal: React.FC = () => {
                 className={`py-2.5 px-3 rounded-2xl text-xs font-bold transition-all border ${
                   type === 'income'
                     ? 'bg-[#1F9D73] text-white border-[#1F9D73] shadow-md'
-                    : 'bg-[#EDE5D5] text-[#231942] border-[#DFD5C3] hover:bg-[#DFD5C3]'
+                    : 'bg-[#EDE5D5] dark:bg-[#241C3D] text-[#231942] dark:text-[#F7F2E7] border-[#DFD5C3] dark:border-[#322653] hover:bg-[#DFD5C3]'
                 }`}
               >
                 Entrada / Receita
@@ -148,8 +147,8 @@ export const AddTransactionModal: React.FC = () => {
                 onClick={() => { setType('savings'); setPillarId('wealth'); }}
                 className={`py-2.5 px-3 rounded-2xl text-xs font-bold transition-all border ${
                   type === 'savings'
-                    ? 'bg-[#6E44FF] text-white border-[#6E44FF] shadow-md'
-                    : 'bg-[#EDE5D5] text-[#231942] border-[#DFD5C3] hover:bg-[#DFD5C3]'
+                    ? 'bg-[#6E44FF] dark:bg-[#7C5CFF] text-white border-[#6E44FF] dark:border-[#7C5CFF] shadow-md'
+                    : 'bg-[#EDE5D5] dark:bg-[#241C3D] text-[#231942] dark:text-[#F7F2E7] border-[#DFD5C3] dark:border-[#322653] hover:bg-[#DFD5C3]'
                 }`}
               >
                 Guardar / Reserva
@@ -160,32 +159,32 @@ export const AddTransactionModal: React.FC = () => {
           {/* Título & Valor */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-[#655A7C] mb-1">
+              <label className="block text-xs font-bold text-[#655A7C] dark:text-[#A69BB8] mb-1">
                 Título do Lançamento *
               </label>
               <input
                 type="text"
                 required
-                placeholder="Ex: Conta de Luz, Ração Gatos"
+                placeholder="Ex: Conta de Luz, Ração"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                className="w-full px-4 py-3 rounded-2xl bg-white border border-[#DFD5C3] text-[#231942] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+                className="w-full px-4 py-3 rounded-2xl bg-white dark:bg-[#241C3D] border border-[#DFD5C3] dark:border-[#322653] text-[#231942] dark:text-[#F7F2E7] placeholder:text-[#655A7C]/50 dark:placeholder:text-[#A69BB8]/40 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#6E44FF] dark:focus:ring-[#7C5CFF]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#655A7C] mb-1">
+              <label className="block text-xs font-bold text-[#655A7C] dark:text-[#A69BB8] mb-1">
                 Valor (R$) *
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-[#655A7C]">R$</span>
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-[#655A7C] dark:text-[#A69BB8]">R$</span>
                 <input
                   type="text"
                   required
                   placeholder="0,00"
                   value={amountStr}
                   onChange={e => setAmountStr(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white border border-[#DFD5C3] text-[#231942] text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-[#241C3D] border border-[#DFD5C3] dark:border-[#322653] text-[#231942] dark:text-[#F7F2E7] text-sm font-black focus:outline-none focus:ring-2 focus:ring-[#6E44FF] dark:focus:ring-[#7C5CFF]"
                 />
               </div>
             </div>
@@ -195,7 +194,7 @@ export const AddTransactionModal: React.FC = () => {
           {type !== 'income' && (
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-[#655A7C] mb-1">
+                <label className="block text-xs font-bold text-[#655A7C] dark:text-[#A69BB8] mb-1">
                   Pilar Macro Financeiro
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
@@ -210,8 +209,8 @@ export const AddTransactionModal: React.FC = () => {
                       }}
                       className={`p-2 rounded-xl text-left text-xs font-bold transition-all border flex items-center gap-2 ${
                         pillarId === p.id
-                          ? 'bg-[#6E44FF] text-white border-[#6E44FF] shadow-sm'
-                          : 'bg-[#EDE5D5]/60 text-[#231942] border-[#DFD5C3] hover:bg-[#EDE5D5]'
+                          ? 'bg-[#6E44FF] dark:bg-[#7C5CFF] text-white border-[#6E44FF] dark:border-[#7C5CFF] shadow-sm'
+                          : 'bg-[#EDE5D5]/60 dark:bg-[#241C3D] text-[#231942] dark:text-[#F7F2E7] border-[#DFD5C3] dark:border-[#322653] hover:bg-[#EDE5D5]'
                       }`}
                     >
                       <DynamicIcon name={p.iconName} className="w-4 h-4 shrink-0" />
@@ -223,14 +222,14 @@ export const AddTransactionModal: React.FC = () => {
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-[#655A7C]">
+                  <label className="text-xs font-bold text-[#655A7C] dark:text-[#A69BB8]">
                     Subcategoria
                   </label>
                   {currentSubcategories.length > 0 && (
                     <button
                       type="button"
                       onClick={() => setIsCreatingInlineSub(!isCreatingInlineSub)}
-                      className="text-xs font-bold text-[#6E44FF] hover:underline flex items-center gap-1"
+                      className="text-xs font-bold text-[#6E44FF] dark:text-[#7C5CFF] hover:underline flex items-center gap-1"
                     >
                       {isCreatingInlineSub ? 'Selecionar existente' : '+ Nova subcategoria'}
                     </button>
@@ -241,14 +240,14 @@ export const AddTransactionModal: React.FC = () => {
                   <div className="space-y-1.5">
                     <input
                       type="text"
-                      placeholder="Nome da subcategoria (ex: Aluguel, Mercado, Ração)"
+                      placeholder="Nome da subcategoria (ex: Aluguel, Mercado)"
                       value={inlineSubName}
                       onChange={e => setInlineSubName(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-2xl bg-white border border-[#6E44FF] text-[#231942] text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#6E44FF] placeholder:text-[#655A7C]/50"
+                      className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-[#241C3D] border border-[#6E44FF] dark:border-[#7C5CFF] text-[#231942] dark:text-[#F7F2E7] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#6E44FF] dark:focus:ring-[#7C5CFF] placeholder:text-[#655A7C]/50 dark:placeholder:text-[#A69BB8]/40"
                     />
                     {currentSubcategories.length === 0 && (
-                      <p className="text-[11px] text-[#655A7C]">
-                        Nenhuma subcategoria neste pilar. Digite o nome para criá-la automaticamente.
+                      <p className="text-[11px] font-semibold text-[#655A7C] dark:text-[#A69BB8]">
+                        Nenhuma subcategoria neste pilar. Digite o nome para criá-la.
                       </p>
                     )}
                   </div>
@@ -256,7 +255,7 @@ export const AddTransactionModal: React.FC = () => {
                   <select
                     value={subCategoryId}
                     onChange={e => setSubCategoryId(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-white border border-[#DFD5C3] text-[#231942] text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-[#241C3D] border border-[#DFD5C3] dark:border-[#322653] text-[#231942] dark:text-[#F7F2E7] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#6E44FF] dark:focus:ring-[#7C5CFF]"
                   >
                     <option value="">Selecione uma subcategoria</option>
                     {currentSubcategories.map(sub => (
@@ -273,13 +272,13 @@ export const AddTransactionModal: React.FC = () => {
           {/* Recorrência & Parcelas */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <div>
-              <label className="block text-xs font-bold text-[#655A7C] mb-1">
+              <label className="block text-xs font-bold text-[#655A7C] dark:text-[#A69BB8] mb-1">
                 Recorrência
               </label>
               <select
                 value={recurrence}
                 onChange={e => setRecurrence(e.target.value as RecurrenceType)}
-                className="w-full px-3 py-2.5 rounded-2xl bg-white border border-[#DFD5C3] text-[#231942] text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+                className="w-full px-3 py-2.5 rounded-2xl bg-white dark:bg-[#241C3D] border border-[#DFD5C3] dark:border-[#322653] text-[#231942] dark:text-[#F7F2E7] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#6E44FF] dark:focus:ring-[#7C5CFF]"
               >
                 <option value="single">Lançamento Único</option>
                 <option value="fixed_monthly">Fixo Todo Mês</option>
@@ -289,7 +288,7 @@ export const AddTransactionModal: React.FC = () => {
 
             {recurrence === 'installment' ? (
               <div>
-                <label className="block text-xs font-bold text-[#655A7C] mb-1">
+                <label className="block text-xs font-bold text-[#655A7C] dark:text-[#A69BB8] mb-1">
                   Parcela Atual / Total
                 </label>
                 <div className="flex items-center gap-2">
@@ -298,23 +297,23 @@ export const AddTransactionModal: React.FC = () => {
                     min="1"
                     value={currentInstallment}
                     onChange={e => setCurrentInstallment(e.target.value)}
-                    className="w-1/2 px-3 py-2.5 rounded-2xl bg-white border border-[#DFD5C3] text-sm font-bold text-center"
+                    className="w-1/2 px-3 py-2.5 rounded-2xl bg-white dark:bg-[#241C3D] border border-[#DFD5C3] dark:border-[#322653] text-[#231942] dark:text-[#F7F2E7] text-sm font-bold text-center"
                     placeholder="Atual"
                   />
-                  <span className="text-[#655A7C] font-bold">/</span>
+                  <span className="text-[#655A7C] dark:text-[#A69BB8] font-bold">/</span>
                   <input
                     type="number"
                     min="2"
                     value={totalInstallments}
                     onChange={e => setTotalInstallments(e.target.value)}
-                    className="w-1/2 px-3 py-2.5 rounded-2xl bg-white border border-[#DFD5C3] text-sm font-bold text-center"
+                    className="w-1/2 px-3 py-2.5 rounded-2xl bg-white dark:bg-[#241C3D] border border-[#DFD5C3] dark:border-[#322653] text-[#231942] dark:text-[#F7F2E7] text-sm font-bold text-center"
                     placeholder="Total"
                   />
                 </div>
               </div>
             ) : (
               <div>
-                <label className="block text-xs font-bold text-[#655A7C] mb-1">
+                <label className="block text-xs font-bold text-[#655A7C] dark:text-[#A69BB8] mb-1">
                   Data de Vencimento
                 </label>
                 <div className="relative">
@@ -323,7 +322,7 @@ export const AddTransactionModal: React.FC = () => {
                     required
                     value={dueDate}
                     onChange={e => setDueDate(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-2xl bg-white border border-[#DFD5C3] text-[#231942] text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+                    className="w-full px-3 py-2.5 rounded-2xl bg-white dark:bg-[#241C3D] border border-[#DFD5C3] dark:border-[#322653] text-[#231942] dark:text-[#F7F2E7] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#6E44FF] dark:focus:ring-[#7C5CFF]"
                   />
                 </div>
               </div>
@@ -331,16 +330,16 @@ export const AddTransactionModal: React.FC = () => {
           </div>
 
           {/* Switch de Pago Imediatamente */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-[#EDE5D5]/50 border border-[#DFD5C3]">
+          <div className="flex items-center justify-between p-3 rounded-2xl bg-[#EDE5D5]/50 dark:bg-[#241C3D]/60 border border-[#DFD5C3] dark:border-[#322653]">
             <div>
-              <span className="text-xs font-bold text-[#231942] block">Lançamento já quitado?</span>
-              <span className="text-[11px] text-[#655A7C]">Marque para dar baixa imediata</span>
+              <span className="text-xs font-bold text-[#231942] dark:text-[#F7F2E7] block">Lançamento já quitado?</span>
+              <span className="text-[11px] font-semibold text-[#655A7C] dark:text-[#A69BB8]">Dar baixa imediata</span>
             </div>
             <button
               type="button"
               onClick={() => setPaid(!paid)}
               className={`w-12 h-6 rounded-full transition-colors relative ${
-                paid ? 'bg-[#1F9D73]' : 'bg-[#DFD5C3]'
+                paid ? 'bg-[#1F9D73]' : 'bg-[#DFD5C3] dark:bg-[#322653]'
               }`}
             >
               <div className={`w-5 h-5 rounded-full bg-white shadow-md transition-transform absolute top-0.5 ${
@@ -350,20 +349,19 @@ export const AddTransactionModal: React.FC = () => {
           </div>
 
           {/* Switch de Notificações / Alertas */}
-          <div className="p-3.5 rounded-2xl bg-white border border-[#DFD5C3] space-y-2.5">
+          <div className="p-3.5 rounded-2xl bg-white dark:bg-[#241C3D]/80 border border-[#DFD5C3] dark:border-[#322653] space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Bell className="w-4 h-4 text-[#6E44FF]" />
+                <Bell className="w-4 h-4 text-[#6E44FF] dark:text-[#7C5CFF]" />
                 <div>
-                  <span className="text-xs font-bold text-[#231942] block">Alertas de Vencimento</span>
-                  <span className="text-[11px] text-[#655A7C]">Notificar no dia e véspera</span>
+                  <span className="text-xs font-bold text-[#231942] dark:text-[#F7F2E7] block">Alertas de Vencimento</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setNotifyEnabled(!notifyEnabled)}
                 className={`w-12 h-6 rounded-full transition-colors relative ${
-                  notifyEnabled ? 'bg-[#6E44FF]' : 'bg-[#DFD5C3]'
+                  notifyEnabled ? 'bg-[#6E44FF] dark:bg-[#7C5CFF]' : 'bg-[#DFD5C3] dark:bg-[#322653]'
                 }`}
               >
                 <div className={`w-5 h-5 rounded-full bg-white shadow-md transition-transform absolute top-0.5 ${
@@ -373,28 +371,26 @@ export const AddTransactionModal: React.FC = () => {
             </div>
 
             {notifyEnabled && (
-              <div className="pt-2 border-t border-[#DFD5C3]/60 flex items-center gap-4 text-xs">
-                <label className="flex items-center gap-1.5 cursor-pointer text-[#231942] font-semibold">
+              <div className="pt-2 border-t border-[#DFD5C3]/60 dark:border-[#322653] flex items-center gap-4 text-xs">
+                <label className="flex items-center gap-1.5 cursor-pointer text-[#231942] dark:text-[#F7F2E7] font-semibold">
                   <input
                     type="checkbox"
                     checked={notifyPush}
                     onChange={e => setNotifyPush(e.target.checked)}
                     className="rounded text-[#6E44FF] focus:ring-[#6E44FF]"
                   />
-                  <Smartphone className="w-3.5 h-3.5 text-[#6E44FF]" />
-                  <span>Notificação Push</span>
+                  <Smartphone className="w-3.5 h-3.5 text-[#6E44FF] dark:text-[#7C5CFF]" />
+                  <span>Push</span>
                 </label>
-                <label className="flex items-center gap-1.5 cursor-pointer text-[#231942] font-semibold">
+                <label className="flex items-center gap-1.5 cursor-pointer text-[#231942] dark:text-[#F7F2E7] font-semibold">
                   <input
                     type="checkbox"
                     checked={notifyEmail}
                     onChange={e => setNotifyEmail(e.target.checked)}
                     className="rounded text-[#6E44FF] focus:ring-[#6E44FF]"
                   />
-                  <Mail className="w-3.5 h-3.5 text-[#1F9D73]" />
-                  <span>
-                    {settings.userEmail ? `E-mail (${settings.userEmail})` : 'E-mail (Definir em Ajustes)'}
-                  </span>
+                  <Mail className="w-3.5 h-3.5 text-[#1F9D73] dark:text-[#34D399]" />
+                  <span>E-mail</span>
                 </label>
               </div>
             )}
@@ -407,7 +403,7 @@ export const AddTransactionModal: React.FC = () => {
               rows={2}
               value={notes}
               onChange={e => setNotes(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-2xl bg-white border border-[#DFD5C3] text-xs font-medium text-[#231942] focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+              className="w-full px-4 py-2.5 rounded-2xl bg-white dark:bg-[#241C3D] border border-[#DFD5C3] dark:border-[#322653] text-xs font-semibold text-[#231942] dark:text-[#F7F2E7] placeholder:text-[#655A7C]/50 dark:placeholder:text-[#A69BB8]/40 focus:outline-none focus:ring-2 focus:ring-[#6E44FF] dark:focus:ring-[#7C5CFF]"
             />
           </div>
 
@@ -415,7 +411,7 @@ export const AddTransactionModal: React.FC = () => {
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full py-3.5 px-6 rounded-2xl bg-[#6E44FF] hover:bg-[#5A32E6] text-white font-bold text-sm shadow-xl flex items-center justify-center gap-2 active:scale-[0.99] transition-all"
+              className="w-full py-3.5 px-6 rounded-2xl bg-[#6E44FF] hover:bg-[#5A32E6] dark:bg-[#7C5CFF] dark:hover:bg-[#6E44FF] text-white font-bold text-sm shadow-xl flex items-center justify-center gap-2 active:scale-[0.99] transition-all"
             >
               <Plus className="w-5 h-5 stroke-[2.5]" />
               <span>Salvar Lançamento</span>

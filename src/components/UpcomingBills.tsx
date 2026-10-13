@@ -16,29 +16,28 @@ export const UpcomingBills: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] transition-all duration-300 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:via-transparent before:to-[#6E44FF]/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:pointer-events-none">
+    <div className="bg-[#FCF9F2]/75 dark:bg-[#1A142D]/80 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 dark:border-[#322653] shadow-[0_8px_30px_rgb(35,25,66,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-all duration-300 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:via-transparent before:to-[#6E44FF]/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:pointer-events-none">
       <div className="flex items-center justify-between mb-4 relative z-10">
         <div>
-          <h2 className="text-lg font-bold text-[#231942] flex items-center gap-2">
+          <h2 className="text-lg font-extrabold tracking-tight text-[#231942] dark:text-[#F7F2E7] flex items-center gap-2">
             <span>Próximos Vencimentos</span>
             <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#D97706] font-bold">
               {upcomingBills.length} pendentes
             </span>
           </h2>
-          <p className="text-xs text-[#655A7C]">Contas a pagar e cobranças agendadas</p>
         </div>
       </div>
 
       {upcomingBills.length === 0 ? (
-        <div className="py-8 text-center text-[#655A7C] bg-white/50 rounded-2xl border border-dashed border-[#DFD5C3] relative z-10">
+        <div className="py-8 text-center text-[#655A7C] dark:text-[#A69BB8] bg-white/50 dark:bg-[#241C3D]/60 rounded-2xl border border-dashed border-[#DFD5C3] dark:border-[#3B2D63] relative z-10">
           <div className="w-12 h-12 rounded-full bg-[#E1F7EF] text-[#1F9D73] flex items-center justify-center mx-auto mb-2 shadow-sm">
             <Check className="w-6 h-6 stroke-[2.5]" />
           </div>
-          <p className="font-bold text-[#231942]">Tudo em dia!</p>
-          <p className="text-xs">Nenhuma conta pendente para os próximos dias.</p>
+          <p className="font-extrabold text-[#231942] dark:text-[#F7F2E7]">Tudo em dia!</p>
+          <p className="text-xs font-medium">Nenhuma conta pendente para os próximos dias.</p>
         </div>
       ) : (
-        <div className="space-y-3 relative z-10">
+        <div className="space-y-2.5 relative z-10">
           {upcomingBills.map(bill => {
             const sub = getSubCategory(bill.subCategoryId);
             const pillar = getPillar(bill.pillarId);
@@ -47,7 +46,7 @@ export const UpcomingBills: React.FC = () => {
             return (
               <div
                 key={bill.id}
-                className="p-4 rounded-2xl bg-white/85 backdrop-blur-sm hover:bg-white hover:border-[#6E44FF]/40 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 border border-[#DFD5C3] space-y-3 active:scale-[0.99]"
+                className="p-4 rounded-2xl bg-white/85 dark:bg-[#241C3D] backdrop-blur-sm hover:bg-white dark:hover:bg-[#2A2046] hover:border-[#6E44FF]/40 dark:hover:border-[#7C5CFF]/60 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 border border-[#DFD5C3] dark:border-[#3B2D63] space-y-3 active:scale-[0.99]"
               >
                 {/* Top Row: Icon + Title & Category */}
                 <div className="flex items-center justify-between gap-3">
@@ -61,7 +60,7 @@ export const UpcomingBills: React.FC = () => {
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="font-bold text-[#231942] text-sm truncate">{bill.title}</h4>
+                        <h4 className="font-extrabold text-[#231942] dark:text-[#F7F2E7] text-sm truncate tracking-tight">{bill.title}</h4>
                         {bill.recurrence === 'installment' && bill.currentInstallment && (
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E5DEFF] text-[#6E44FF]">
                             {bill.currentInstallment}/{bill.totalInstallments}
@@ -69,11 +68,11 @@ export const UpcomingBills: React.FC = () => {
                         )}
                       </div>
                       
-                      <div className="flex items-center gap-2 text-xs text-[#655A7C] mt-0.5">
-                        <span className="font-medium truncate">{sub?.name || pillar?.shortName}</span>
+                      <div className="flex items-center gap-2 text-xs text-[#655A7C] dark:text-[#A69BB8] mt-0.5 font-medium">
+                        <span className="truncate">{sub?.name || pillar?.shortName}</span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3 text-[#6E44FF]" />
+                          <Calendar className="w-3 h-3 text-[#6E44FF] dark:text-[#7C5CFF]" />
                           {formatDateBR(bill.dueDate)}
                         </span>
                       </div>
@@ -82,14 +81,14 @@ export const UpcomingBills: React.FC = () => {
 
                   {/* Value */}
                   <div className="text-right shrink-0">
-                    <span className="font-extrabold text-[#231942] text-base whitespace-nowrap">
+                    <span className="font-extrabold text-[#231942] dark:text-[#F7F2E7] text-base whitespace-nowrap tracking-tight">
                       {formatCurrency(bill.amount)}
                     </span>
                   </div>
                 </div>
 
                 {/* Bottom Row: Badges & 1-click Pay Button */}
-                <div className="flex items-center justify-between pt-2 border-t border-[#DFD5C3]/60">
+                <div className="flex items-center justify-between pt-2 border-t border-[#DFD5C3]/60 dark:border-[#322653]">
                   <div className="flex items-center gap-2">
                     {/* Due badge */}
                     <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${dueStatus.bg} ${dueStatus.color} flex items-center gap-1`}>
@@ -99,8 +98,8 @@ export const UpcomingBills: React.FC = () => {
 
                     {/* Notification chips */}
                     {bill.notifyEnabled && (
-                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white/90 border border-[#DFD5C3] text-[10px] text-[#655A7C] font-semibold shadow-inner" title="Alertas ativados">
-                        {bill.notifyPush && <Bell className="w-3 h-3 text-[#6E44FF]" />}
+                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white/90 dark:bg-[#1A142D] border border-[#DFD5C3] dark:border-[#3B2D63] text-[10px] text-[#655A7C] dark:text-[#A69BB8] font-bold shadow-inner" title="Alertas ativados">
+                        {bill.notifyPush && <Bell className="w-3 h-3 text-[#6E44FF] dark:text-[#7C5CFF]" />}
                         {bill.notifyEmail && <Mail className="w-3 h-3 text-[#1F9D73]" />}
                       </div>
                     )}

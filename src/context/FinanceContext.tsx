@@ -46,6 +46,9 @@ interface FinanceContextType {
   setDeviceViewMode: (mode: 'responsive' | 'mobile-mockup') => void;
   selectedPillarForDetail: MacroPillarId | null;
   setSelectedPillarForDetail: (pillar: MacroPillarId | null) => void;
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
+  toggleTheme: () => void;
   
   // Subcategory management
   addSubCategory: (sub: Omit<SubCategory, 'id'>) => Promise<SubCategory | null>;
@@ -191,6 +194,41 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [isNotificationOpen, setIsNotificationOpen] = useState<boolean>(false);
   const [deviceViewMode, setDeviceViewMode] = useState<'responsive' | 'mobile-mockup'>('responsive');
   const [selectedPillarForDetail, setSelectedPillarForDetail] = useState<MacroPillarId | null>(null);
+
+  // Noctis Theme Mode (Light / Dark)
+  const [theme, setThemeState] = useState<'light' | 'dark'>(() => {
+    try {
+      const saved = localStorage.getItem('noctis_prod_v1_theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+      }
+    } catch {
+      // ignore
+    }
+    return 'light';
+  });
+
+  const setTheme = (newTheme: 'light' | 'dark') => {
+    setThemeState(newTheme);
+  };
+
+  const toggleTheme = () => {
+    setThemeState(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('noctis_prod_v1_theme', theme);
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, [theme]);
 
   // Espelhamento no LocalStorage para resiliência offline (PWA)
   useEffect(() => {
@@ -749,6 +787,9 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setDeviceViewMode,
         selectedPillarForDetail,
         setSelectedPillarForDetail,
+        theme,
+        setTheme,
+        toggleTheme,
         addSubCategory,
         updateSubCategory,
         deleteSubCategory,

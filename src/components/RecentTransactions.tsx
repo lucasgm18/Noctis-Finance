@@ -14,42 +14,41 @@ export const RecentTransactions: React.FC = () => {
   const filtered = transactions.slice(0, 7);
 
   return (
-    <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] transition-all duration-300 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:via-transparent before:to-[#6E44FF]/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:pointer-events-none">
+    <div className="bg-[#FCF9F2]/75 dark:bg-[#1A142D]/80 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 dark:border-[#322653] shadow-[0_8px_30px_rgb(35,25,66,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-all duration-300 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:via-transparent before:to-[#6E44FF]/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:pointer-events-none">
       {/* Top Header & FinWise Filter Pills */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5 relative z-10">
         <div>
-          <h2 className="text-lg font-bold text-[#231942]">Últimas Movimentações</h2>
-          <p className="text-xs text-[#655A7C]">Transações e registros recentes</p>
+          <h2 className="text-lg font-extrabold tracking-tight text-[#231942] dark:text-[#F7F2E7]">Movimentações</h2>
         </div>
 
-        {/* FinWise Pill Group */}
-        <div className="flex bg-[#EDE5D5]/80 backdrop-blur-sm p-1 rounded-full border border-[#DFD5C3] self-stretch sm:self-auto justify-between sm:justify-start">
+        {/* FinWise Pill Group - 100% width 3 columns on mobile */}
+        <div className="grid grid-cols-3 sm:flex w-full sm:w-auto bg-[#EDE5D5]/80 dark:bg-[#241C3D] backdrop-blur-sm p-1 rounded-full border border-[#DFD5C3] dark:border-[#3B2D63]">
           <button
             onClick={() => setFilterPeriod('daily')}
-            className={`px-3 py-1 text-xs font-bold rounded-full transition-all active:scale-95 ${
+            className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all text-center active:scale-95 ${
               filterPeriod === 'daily'
-                ? 'bg-[#6E44FF] text-white shadow-sm'
-                : 'text-[#655A7C] hover:text-[#231942]'
+                ? 'bg-[#6E44FF] dark:bg-[#7C5CFF] text-white shadow-sm'
+                : 'text-[#655A7C] dark:text-[#A69BB8] hover:text-[#231942] dark:hover:text-white'
             }`}
           >
             Diário
           </button>
           <button
             onClick={() => setFilterPeriod('weekly')}
-            className={`px-3 py-1 text-xs font-bold rounded-full transition-all active:scale-95 ${
+            className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all text-center active:scale-95 ${
               filterPeriod === 'weekly'
-                ? 'bg-[#6E44FF] text-white shadow-sm'
-                : 'text-[#655A7C] hover:text-[#231942]'
+                ? 'bg-[#6E44FF] dark:bg-[#7C5CFF] text-white shadow-sm'
+                : 'text-[#655A7C] dark:text-[#A69BB8] hover:text-[#231942] dark:hover:text-white'
             }`}
           >
             Semanal
           </button>
           <button
             onClick={() => setFilterPeriod('monthly')}
-            className={`px-3 py-1 text-xs font-bold rounded-full transition-all active:scale-95 ${
+            className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all text-center active:scale-95 ${
               filterPeriod === 'monthly'
-                ? 'bg-[#6E44FF] text-white shadow-sm'
-                : 'text-[#655A7C] hover:text-[#231942]'
+                ? 'bg-[#6E44FF] dark:bg-[#7C5CFF] text-white shadow-sm'
+                : 'text-[#655A7C] dark:text-[#A69BB8] hover:text-[#231942] dark:hover:text-white'
             }`}
           >
             Mensal
@@ -59,12 +58,12 @@ export const RecentTransactions: React.FC = () => {
 
       {/* Transaction List */}
       {transactions.length === 0 ? (
-        <div className="py-10 text-center text-[#655A7C] bg-white/50 rounded-2xl border border-dashed border-[#DFD5C3] relative z-10">
-          <p className="font-bold text-[#231942] text-sm">Nenhum lançamento registrado</p>
-          <p className="text-xs text-[#655A7C] mt-1">Adicione sua primeira despesa ou receita no botão "+" para começar.</p>
+        <div className="py-10 text-center text-[#655A7C] dark:text-[#A69BB8] bg-white/50 dark:bg-[#241C3D]/60 rounded-2xl border border-dashed border-[#DFD5C3] dark:border-[#3B2D63] relative z-10">
+          <p className="font-extrabold text-[#231942] dark:text-[#F7F2E7] text-sm">Nenhum lançamento registrado</p>
+          <p className="text-xs text-[#655A7C] dark:text-[#A69BB8] mt-1 font-medium">Adicione sua primeira movimentação no botão "+" para começar.</p>
         </div>
       ) : (
-        <div className="space-y-3 relative z-10">
+        <div className="space-y-2.5 relative z-10">
           {filtered.map(tx => {
             const sub = getSubCategory(tx.subCategoryId);
             const pillar = getPillar(tx.pillarId);
@@ -78,7 +77,7 @@ export const RecentTransactions: React.FC = () => {
             return (
               <div
                 key={tx.id}
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-white/90 backdrop-blur-sm hover:bg-white hover:border-[#6E44FF]/40 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 border border-[#DFD5C3]/80 group active:scale-[0.99]"
+                className="flex items-center justify-between p-3.5 rounded-2xl bg-white/90 dark:bg-[#241C3D] backdrop-blur-sm hover:bg-white dark:hover:bg-[#2A2046] hover:border-[#6E44FF]/40 dark:hover:border-[#7C5CFF]/60 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 border border-[#DFD5C3]/80 dark:border-[#3B2D63] group active:scale-[0.99]"
               >
                 {/* Left */}
                 <div className="flex items-center gap-3 min-w-0">
@@ -90,8 +89,8 @@ export const RecentTransactions: React.FC = () => {
                   </div>
 
                   <div className="min-w-0">
-                    <h4 className="font-bold text-[#231942] text-sm truncate">{tx.title}</h4>
-                    <div className="flex items-center gap-2 text-xs text-[#655A7C] mt-0.5">
+                    <h4 className="font-extrabold text-[#231942] dark:text-[#F7F2E7] text-sm truncate tracking-tight">{tx.title}</h4>
+                    <div className="flex items-center gap-2 text-xs text-[#655A7C] dark:text-[#A69BB8] mt-0.5 font-medium">
                       <span>{formatDateBR(tx.dueDate)}</span>
                       <span>•</span>
                       <span className="truncate max-w-[120px]">{sub?.name || (isIncome ? 'Entrada' : 'Geral')}</span>
@@ -102,12 +101,12 @@ export const RecentTransactions: React.FC = () => {
                 {/* Right: Amount & Paid status indicator */}
                 <div className="flex items-center gap-3 shrink-0">
                   <div className="text-right">
-                    <div className={`font-extrabold text-sm sm:text-base whitespace-nowrap ${
-                      isIncome ? 'text-[#1F9D73]' : isSavings ? 'text-[#835FFF]' : 'text-[#E0533C]'
+                    <div className={`font-extrabold text-sm sm:text-base whitespace-nowrap tracking-tight ${
+                      isIncome ? 'text-[#1F9D73]' : isSavings ? 'text-[#835FFF] dark:text-[#9A7DFF]' : 'text-[#E0533C]'
                     }`}>
                       {isIncome ? '+' : '-'}{formatCurrency(tx.amount)}
                     </div>
-                    <div className="text-[10px] font-semibold">
+                    <div className="text-[10px] font-bold">
                       {tx.paid ? (
                         <span className="text-[#1F9D73] flex items-center justify-end gap-0.5">
                           <Check className="w-2.5 h-2.5 stroke-[3]" /> Pago
@@ -127,12 +126,12 @@ export const RecentTransactions: React.FC = () => {
       )}
 
       {/* View All Button */}
-      <div className="mt-4 pt-3 border-t border-[#DFD5C3]/60 text-center relative z-10">
+      <div className="mt-4 pt-3 border-t border-[#DFD5C3]/60 dark:border-[#322653] text-center relative z-10">
         <button
           onClick={() => setActiveTab('transactions')}
-          className="text-xs font-bold text-[#6E44FF] hover:text-[#5A32E6] inline-flex items-center gap-1 py-1.5 px-3.5 rounded-full hover:bg-[#E5DEFF]/60 active:scale-95 transition-all shadow-sm"
+          className="text-xs font-bold text-[#6E44FF] dark:text-[#7C5CFF] hover:text-[#5A32E6] inline-flex items-center gap-1 py-1.5 px-3.5 rounded-full hover:bg-[#E5DEFF]/60 dark:hover:bg-[#2D2054] active:scale-95 transition-all shadow-sm"
         >
-          <span>Ver extrato completo com filtros</span>
+          <span>Ver extrato</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>

@@ -1,4 +1,3 @@
-import React from 'react';
 import { 
   Home, 
   PieChart, 
@@ -10,7 +9,9 @@ import {
   Smartphone, 
   Monitor,
   Bell,
-  Wallet
+  Wallet,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { NoctisLogo } from './NoctisLogo';
@@ -28,19 +29,21 @@ export const Sidebar: React.FC = () => {
     setDeviceViewMode,
     unreadNotificationsCount,
     setIsNotificationOpen,
+    theme,
+    toggleTheme,
     settings,
   } = useFinance();
 
   const navItems = [
-    { id: 'home', label: 'Início & Resumo', icon: Home },
-    { id: 'analysis', label: 'Análise & Gráficos', icon: PieChart },
-    { id: 'categories', label: '5 Pilares & Categorias', icon: Layers },
-    { id: 'transactions', label: 'Extrato Completo', icon: Receipt },
-    { id: 'settings', label: 'Alertas & Ajustes', icon: Sliders },
+    { id: 'home', label: 'Início', icon: Home },
+    { id: 'analysis', label: 'Análise', icon: PieChart },
+    { id: 'categories', label: 'Categorias', icon: Layers },
+    { id: 'transactions', label: 'Extrato', icon: Receipt },
+    { id: 'settings', label: 'Configurações', icon: Sliders },
   ] as const;
 
   return (
-    <aside className="w-72 bg-[#6E44FF] text-white flex flex-col justify-between p-6 shadow-2xl h-screen sticky top-0 shrink-0 z-30 select-none">
+    <aside className="w-72 bg-[#6E44FF] dark:bg-[#120D22] text-white flex flex-col justify-between p-6 shadow-2xl h-screen sticky top-0 shrink-0 z-30 select-none border-r border-transparent dark:border-[#322653] transition-colors duration-300">
       {/* Top Branding */}
       <div>
         <div className="flex items-center gap-3.5 mb-8 px-2">
@@ -63,9 +66,9 @@ export const Sidebar: React.FC = () => {
         {/* Quick Add Button */}
         <button
           onClick={() => setIsAddModalOpen(true)}
-          className="w-full py-3.5 px-4 mb-7 rounded-2xl bg-[#FCF9F2] text-[#231942] font-bold text-sm shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex items-center justify-center gap-2 hover:bg-white hover:shadow-2xl hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 group"
+          className="w-full py-3.5 px-4 mb-7 rounded-2xl bg-[#FCF9F2] text-[#231942] dark:bg-[#7C5CFF] dark:text-white font-bold text-sm shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-[#6E44FF] hover:shadow-2xl hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 group"
         >
-          <div className="w-6 h-6 rounded-full bg-[#6E44FF] text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+          <div className="w-6 h-6 rounded-full bg-[#6E44FF] dark:bg-white/20 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
             <Plus className="w-4 h-4 stroke-[2.5]" />
           </div>
           <span>Novo Lançamento</span>
@@ -82,12 +85,12 @@ export const Sidebar: React.FC = () => {
                 onClick={() => setActiveTab(item.id)}
                 className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-200 active:scale-[0.98] ${
                   isActive
-                    ? 'bg-[#FCF9F2] text-[#231942] shadow-lg font-bold'
+                    ? 'bg-[#FCF9F2] text-[#231942] dark:bg-[#241C3D] dark:text-[#F7F2E7] shadow-lg font-bold'
                     : 'text-[#E5DEFF] hover:bg-white/15 hover:text-white'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Icon className={`w-5 h-5 ${isActive ? 'text-[#6E44FF]' : 'text-[#E5DEFF]'}`} />
+                  <Icon className={`w-5 h-5 ${isActive ? 'text-[#6E44FF] dark:text-[#7C5CFF]' : 'text-[#E5DEFF]'}`} />
                   <span>{item.label}</span>
                 </div>
                 {item.id === 'settings' && unreadNotificationsCount > 0 && (
@@ -118,21 +121,36 @@ export const Sidebar: React.FC = () => {
         </div>
 
         {/* Quick Footer Controls */}
-        <div className="flex items-center justify-between gap-2 px-1">
+        <div className="flex items-center justify-between gap-1.5 px-1">
           {/* Notification Button */}
           <button
             onClick={() => setIsNotificationOpen(true)}
-            className="flex-1 py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-xs font-semibold text-white flex items-center justify-center gap-1.5 transition-all border border-white/10 hover:border-white/25"
+            className="flex-1 py-2 px-2.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-xs font-semibold text-white flex items-center justify-center gap-1.5 transition-all border border-white/10 hover:border-white/25"
+            title="Central de Alertas"
           >
             <Bell className="w-3.5 h-3.5" />
             <span>Alertas</span>
+          </button>
+
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            title={theme === 'dark' ? 'Mudar para Tema Claro' : 'Mudar para Tema Escuro'}
+            className="py-2 px-2.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-xs font-semibold text-white flex items-center justify-center gap-1.5 transition-all border border-white/10 hover:border-white/25"
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-3.5 h-3.5 text-[#FEF3C7]" />
+            ) : (
+              <Moon className="w-3.5 h-3.5 text-[#E5DEFF]" />
+            )}
+            <span>{theme === 'dark' ? 'Claro' : 'Escuro'}</span>
           </button>
 
           {/* Biometrics Lock */}
           <button
             onClick={lockApp}
             title="Bloquear agora"
-            className="py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-xs font-semibold text-white flex items-center justify-center gap-1.5 transition-all border border-white/10 hover:border-white/25"
+            className="py-2 px-2.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-xs font-semibold text-white flex items-center justify-center gap-1.5 transition-all border border-white/10 hover:border-white/25"
           >
             <Lock className="w-3.5 h-3.5" />
             <span>Bloquear</span>
