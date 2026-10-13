@@ -37,7 +37,7 @@ export const AddTransactionModal: React.FC = () => {
   // Filtra as subcategorias de acordo com o pilar selecionado
   const currentSubcategories = subcategories.filter(s => s.pillarId === pillarId);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanAmount = parseFloat(amountStr.replace(',', '.'));
     if (isNaN(cleanAmount) || cleanAmount <= 0) {
@@ -52,16 +52,17 @@ export const AddTransactionModal: React.FC = () => {
 
     let effectiveSubCategory = subCategoryId;
     if (type !== 'income') {
-      if (inlineSubName.trim() || currentSubcategories.length === 0) {
+      if ((isCreatingInlineSub && inlineSubName.trim()) || currentSubcategories.length === 0) {
         const subName = inlineSubName.trim() || title.trim();
-        const generatedId = `sub-${Date.now()}`;
-        addSubCategory({
+        const createdSub = await addSubCategory({
           name: subName,
           pillarId,
           iconName: 'Tag',
           monthlyBudget: 0,
         });
-        effectiveSubCategory = generatedId;
+        if (createdSub) {
+          effectiveSubCategory = createdSub.id;
+        }
       } else if (!effectiveSubCategory && currentSubcategories.length > 0) {
         effectiveSubCategory = currentSubcategories[0].id;
       }
@@ -69,7 +70,7 @@ export const AddTransactionModal: React.FC = () => {
       effectiveSubCategory = 'income-default';
     }
 
-    addTransaction({
+    await addTransaction({
       title: title.trim(),
       amount: cleanAmount,
       type,

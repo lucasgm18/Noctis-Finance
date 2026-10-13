@@ -37,9 +37,9 @@ export const SettingsView: React.FC = () => {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [resetSuccessMessage, setResetSuccessMessage] = useState(false);
 
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateSettings({
+    await updateSettings({
       userName: userName.trim(),
       userEmail: userEmail.trim(),
       monthlyBudgetCeiling: parseFloat(budgetCeiling) || 0,
@@ -55,8 +55,8 @@ export const SettingsView: React.FC = () => {
     setIsTestingPush(false);
   };
 
-  const handleConfirmReset = () => {
-    resetAllData();
+  const handleConfirmReset = async () => {
+    await resetAllData();
     setUserName('');
     setUserEmail('');
     setBudgetCeiling('');

@@ -49,11 +49,11 @@ export const CategoriesView: React.FC = () => {
     return t.pillarId === selectedPillarId;
   });
 
-  const handleCreateSubcategory = (e: React.FormEvent) => {
+  const handleCreateSubcategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newSubName.trim()) return;
 
-    addSubCategory({
+    await addSubCategory({
       name: newSubName.trim(),
       pillarId: targetPillarForNew,
       iconName: newSubIcon,
@@ -210,20 +210,18 @@ export const CategoriesView: React.FC = () => {
                       <span className="text-xs font-bold text-[#231942] truncate">{sub.name}</span>
                     </div>
 
-                    {sub.isCustom && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (confirm(`Excluir a subcategoria ${sub.name}?`)) {
-                            deleteSubCategory(sub.id);
-                          }
-                        }}
-                        className="text-[#655A7C] hover:text-[#E0533C] p-1"
-                        title="Excluir subcategoria"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm(`Excluir a subcategoria "${sub.name}"?`)) {
+                          deleteSubCategory(sub.id);
+                        }
+                      }}
+                      className="text-[#655A7C] hover:text-[#E0533C] p-1 transition-colors"
+                      title="Excluir subcategoria"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
 
                   <div className="mt-3 pt-2 border-t border-[#DFD5C3]/40 flex items-center justify-between text-xs">

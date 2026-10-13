@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { NoctisLogo } from './NoctisLogo';
+import { SyncBadge } from './SyncBadge';
 import { formatCurrency } from '../utils/formatters';
 
 export const Sidebar: React.FC = () => {
@@ -52,6 +53,11 @@ export const Sidebar: React.FC = () => {
               Guardião Financeiro
             </p>
           </div>
+        </div>
+
+        {/* Realtime Supabase Sync Badge */}
+        <div className="mb-6 px-1">
+          <SyncBadge variant="sidebar" className="w-full justify-center" />
         </div>
 
         {/* Quick Add Button */}

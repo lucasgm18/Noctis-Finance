@@ -3,6 +3,7 @@ import { Bell, ArrowUpRight, ArrowDownRight, Lock, CheckCircle2, Sliders } from 
 import { useFinance } from '../context/FinanceContext';
 import { formatCurrency } from '../utils/formatters';
 import { NoctisLogo } from './NoctisLogo';
+import { SyncBadge } from './SyncBadge';
 
 export const Header: React.FC = () => {
   const { 
@@ -28,8 +29,9 @@ export const Header: React.FC = () => {
         <div className="flex items-center gap-3">
           <NoctisLogo className="w-11 h-11 rounded-2xl shadow-md border border-white/20" />
           <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs uppercase tracking-wider text-[#E5DEFF] font-semibold">Noctis Finanças</span>
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-[11px] uppercase tracking-wider text-[#E5DEFF] font-bold">Noctis Finanças</span>
+              <SyncBadge variant="header" />
             </div>
             <h1 className="text-xl font-extrabold tracking-tight text-white">
               {settings.userName ? `Olá, ${settings.userName} 👋` : 'Bem-vindo 👋'}

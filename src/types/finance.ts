@@ -79,3 +79,6 @@ export interface MonthlyComparison {
   expense: number;
   savings: number;
 }
+
+export type SyncStatus = 'synced' | 'syncing' | 'error';
+
