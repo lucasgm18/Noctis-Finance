@@ -1,23 +1,50 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+// Fallback padrão do projeto Noctis (permite que o app funcione mesmo se a Vercel não receber as variáveis no momento do build)
+const FALLBACK_SUPABASE_URL = 'https://rbrzlvjtgjujawjeexuz.supabase.co';
+const FALLBACK_SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJicnpsdmp0Z2p1amF3amVleHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5MjAyMDksImV4cCI6MjEwNzQ5NjIwOX0.11Dld0Qd8vRZA9ZAmtKtmm7HHv6I1GWY28UPm5ofKfA';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('⚠️ Supabase credentials missing. Check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env');
+function extractValidUrl(raw?: string): string {
+  if (!raw) return '';
+  const trimmed = raw.trim();
+  // Caso tenha sido colado como link markdown: [https://...](https://...)
+  const match = trimmed.match(/https?:\/\/[^\s)\]]+/);
+  if (match) return match[0];
+  return trimmed;
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10,
-    },
-  },
-});
+const envUrl = extractValidUrl(import.meta.env.VITE_SUPABASE_URL);
+const envKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || '').trim();
+
+const supabaseUrl = (envUrl && envUrl.startsWith('http')) ? envUrl : FALLBACK_SUPABASE_URL;
+const supabaseAnonKey = envKey || FALLBACK_SUPABASE_ANON_KEY;
+
+function initSupabase() {
+  try {
+    return createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+      realtime: {
+        params: {
+          eventsPerSecond: 10,
+        },
+      },
+    });
+  } catch (err) {
+    console.error('⚠️ Falha ao instanciar cliente Supabase primário, usando fallback:', err);
+    return createClient(FALLBACK_SUPABASE_URL, FALLBACK_SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    });
+  }
+}
+
+export const supabase = initSupabase();
 
 export interface DBSubcategory {
   id: string;
