@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #6E44FF;
+  --primary-hover: #5A32E6;
+  --primary-soft: #E5DEFF;
+  --bg-base: #F7F2E7;
+  --surface-card: #EDE5D5;
+  --surface-light: #FCF9F2;
+  --surface-border: #DFD5C3;
+  --text-main: #231942;
+  --text-muted: #655A7C;
+  --semantic-income: #1F9D73;
+  --semantic-expense: #E0533C;
+  --semantic-warning: #D97706;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text-main);
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F7F2E7;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #DFD5C3;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6E44FF;
+}
+
+/* Glass and elevation effects */
+.finwise-card {
+  background: #FCF9F2;
+  border: 1px solid #DFD5C3;
+  border-radius: 24px;
+}
+
+.finwise-card-soft {
+  background: #EDE5D5;
+  border: 1px solid #DFD5C3;
+  border-radius: 24px;
+}
+
+.glow-purple {
+  box-shadow: 0 8px 30px rgba(110, 68, 255, 0.25);
+}

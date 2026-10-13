@@ -1,0 +1,16 @@
+{
+  "short_name": "Noctis",
+  "name": "Noctis — Guardião Financeiro & Carteira",
+  "icons": [
+    {
+      "src": "/noctis-logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512 192x192 any"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#F7F2E7",
+  "theme_color": "#6E44FF",
+  "display": "standalone",
+  "orientation": "portrait"
+}
