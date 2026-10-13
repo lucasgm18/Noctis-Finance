@@ -59,7 +59,13 @@ export const RecentTransactions: React.FC = () => {
       </div>
 
       {/* Transaction List */}
-      <div className="space-y-3">
+      {transactions.length === 0 ? (
+        <div className="py-10 text-center text-[#655A7C] bg-[#EDE5D5]/30 rounded-2xl border border-dashed border-[#DFD5C3]">
+          <p className="font-bold text-[#231942] text-sm">Nenhum lançamento registrado</p>
+          <p className="text-xs text-[#655A7C] mt-1">Adicione sua primeira despesa ou receita no botão "+" para começar.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
         {filtered.map(tx => {
           const sub = getSubCategory(tx.subCategoryId);
           const pillar = getPillar(tx.pillarId);
@@ -119,6 +125,7 @@ export const RecentTransactions: React.FC = () => {
           );
         })}
       </div>
+      )}
 
       {/* View All Button */}
       <div className="mt-4 pt-3 border-t border-[#DFD5C3] text-center">

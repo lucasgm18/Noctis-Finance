@@ -35,7 +35,7 @@ export interface Transaction {
   title: string;
   amount: number;
   type: TransactionType;
-  pillarId?: MacroPillarId; // Opcional se for 'income'
+  pillarId?: MacroPillarId;
   subCategoryId: string;
   recurrence: RecurrenceType;
   currentInstallment?: number;
@@ -68,11 +68,13 @@ export interface UserSettings {
   pushEnabled: boolean;
   emailEnabled: boolean;
   monthlyBudgetCeiling: number;
+  emergencyGoal: number;
   biometricsEnabled: boolean;
 }
 
 export interface MonthlyComparison {
   month: string;
+  monthKey: string; // YYYY-MM
   income: number;
   expense: number;
   savings: number;

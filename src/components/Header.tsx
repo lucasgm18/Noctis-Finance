@@ -32,7 +32,7 @@ export const Header: React.FC = () => {
               <span className="text-xs uppercase tracking-wider text-[#E5DEFF] font-semibold">Noctis Finanças</span>
             </div>
             <h1 className="text-xl font-extrabold tracking-tight text-white">
-              Olá, {settings.userName || 'Lucas'} 👋
+              {settings.userName ? `Olá, ${settings.userName} 👋` : 'Bem-vindo 👋'}
             </h1>
           </div>
         </div>
@@ -115,14 +115,16 @@ export const Header: React.FC = () => {
             />
           </div>
           <span className="text-xs font-medium text-white/90 pr-3">
-            Teto {formatCurrency(budgetLimit)}
+            {budgetLimit > 0 ? `Teto ${formatCurrency(budgetLimit)}` : 'Sem teto definido'}
           </span>
         </div>
 
         <div className="flex items-center gap-1.5 text-xs text-[#E5DEFF] pl-1 font-medium">
           <CheckCircle2 className="w-3.5 h-3.5 text-[#1F9D73]" />
           <span>
-            {budgetUsedPercentage <= 70 
+            {budgetLimit <= 0
+              ? 'Defina seu teto mensal em Ajustes para acompanhar o consumo.'
+              : budgetUsedPercentage <= 70 
               ? `${budgetUsedPercentage}% das despesas sob controle. Excelente!`
               : budgetUsedPercentage <= 90
               ? `Atenção: ${budgetUsedPercentage}% do teto mensal consumido.`

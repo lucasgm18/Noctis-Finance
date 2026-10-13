@@ -165,62 +165,81 @@ export const CategoriesView: React.FC = () => {
         </div>
 
         {/* Subcategories Horizontal / Grid pills */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {currentSubcategories.map(sub => {
-            const spent = subCategorySpentMap[sub.id] || 0;
-            const pct = sub.monthlyBudget > 0 ? Math.min(Math.round((spent / sub.monthlyBudget) * 100), 100) : 0;
-            const isSelected = selectedSubCategoryId === sub.id;
+        {currentSubcategories.length === 0 ? (
+          <div className="py-10 text-center text-[#655A7C] bg-[#EDE5D5]/30 rounded-2xl border border-dashed border-[#DFD5C3]">
+            <p className="font-bold text-[#231942] text-sm">Nenhuma subcategoria cadastrada ainda</p>
+            <p className="text-xs text-[#655A7C] mt-1 mb-4">
+              Crie subcategorias para organizar seus custos dentro de {selectedPillar.shortName}.
+            </p>
+            <button
+              onClick={() => {
+                setTargetPillarForNew(selectedPillarId);
+                setIsNewSubModalOpen(true);
+              }}
+              className="py-2.5 px-4 rounded-xl bg-[#6E44FF] hover:bg-[#5A32E6] text-white text-xs font-bold shadow-sm inline-flex items-center gap-1.5 transition-all"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Criar Primeira Subcategoria</span>
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {currentSubcategories.map(sub => {
+              const spent = subCategorySpentMap[sub.id] || 0;
+              const pct = sub.monthlyBudget > 0 ? Math.min(Math.round((spent / sub.monthlyBudget) * 100), 100) : 0;
+              const isSelected = selectedSubCategoryId === sub.id;
 
-            return (
-              <div
-                key={sub.id}
-                onClick={() => setSelectedSubCategoryId(isSelected ? null : sub.id)}
-                className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
-                  isSelected
-                    ? 'bg-[#E5DEFF]/70 border-[#6E44FF] shadow-sm'
-                    : 'bg-white hover:bg-[#EDE5D5]/50 border-[#DFD5C3]'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div
-                      className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: selectedPillar.softBg, color: selectedPillar.color }}
-                    >
-                      <DynamicIcon name={sub.iconName} className="w-4 h-4" />
+              return (
+                <div
+                  key={sub.id}
+                  onClick={() => setSelectedSubCategoryId(isSelected ? null : sub.id)}
+                  className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+                    isSelected
+                      ? 'bg-[#E5DEFF]/70 border-[#6E44FF] shadow-sm'
+                      : 'bg-white hover:bg-[#EDE5D5]/50 border-[#DFD5C3]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div
+                        className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: selectedPillar.softBg, color: selectedPillar.color }}
+                      >
+                        <DynamicIcon name={sub.iconName} className="w-4 h-4" />
+                      </div>
+                      <span className="text-xs font-bold text-[#231942] truncate">{sub.name}</span>
                     </div>
-                    <span className="text-xs font-bold text-[#231942] truncate">{sub.name}</span>
+
+                    {sub.isCustom && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm(`Excluir a subcategoria ${sub.name}?`)) {
+                            deleteSubCategory(sub.id);
+                          }
+                        }}
+                        className="text-[#655A7C] hover:text-[#E0533C] p-1"
+                        title="Excluir subcategoria"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
 
-                  {sub.isCustom && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (confirm(`Excluir a subcategoria ${sub.name}?`)) {
-                          deleteSubCategory(sub.id);
-                        }
-                      }}
-                      className="text-[#655A7C] hover:text-[#E0533C] p-1"
-                      title="Excluir subcategoria"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-
-                <div className="mt-3 pt-2 border-t border-[#DFD5C3]/40 flex items-center justify-between text-xs">
-                  <div>
-                    <span className="font-extrabold text-[#231942]">{formatCurrency(spent)}</span>
-                    <span className="text-[10px] text-[#655A7C] ml-1">/ teto {formatCurrency(sub.monthlyBudget)}</span>
+                  <div className="mt-3 pt-2 border-t border-[#DFD5C3]/40 flex items-center justify-between text-xs">
+                    <div>
+                      <span className="font-extrabold text-[#231942]">{formatCurrency(spent)}</span>
+                      <span className="text-[10px] text-[#655A7C] ml-1">/ teto {formatCurrency(sub.monthlyBudget)}</span>
+                    </div>
+                    <span className={`text-[11px] font-bold ${pct > 90 ? 'text-[#E0533C]' : 'text-[#655A7C]'}`}>
+                      {pct}%
+                    </span>
                   </div>
-                  <span className={`text-[11px] font-bold ${pct > 90 ? 'text-[#E0533C]' : 'text-[#655A7C]'}`}>
-                    {pct}%
-                  </span>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Lista de Lançamentos da Categoria / Subcategoria Filtrada */}

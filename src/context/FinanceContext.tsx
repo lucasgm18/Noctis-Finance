@@ -14,7 +14,6 @@ import {
   INITIAL_TRANSACTIONS, 
   INITIAL_NOTIFICATIONS, 
   DEFAULT_USER_SETTINGS,
-  MONTHLY_CHART_DATA 
 } from '../data/mockData';
 import { triggerPaymentConfetti } from '../utils/formatters';
 
@@ -54,6 +53,7 @@ interface FinanceContextType {
   updateSettings: (newSettings: Partial<UserSettings>) => void;
   markAllNotificationsRead: () => void;
   testBrowserNotification: () => Promise<boolean>;
+  resetAllData: () => void;
   
   // Biometrics
   authenticateBiometrics: () => Promise<boolean>;
@@ -76,15 +76,36 @@ interface FinanceContextType {
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
 
+// Chaves limpas de produção com prefixo isolado
 const STORAGE_KEYS = {
-  TRANSACTIONS: 'noctis_transactions_v2',
-  SUBCATEGORIES: 'noctis_subcategories_v2',
-  NOTIFICATIONS: 'noctis_notifications_v2',
-  SETTINGS: 'noctis_settings_v2',
-  LOCKED: 'noctis_is_locked_v2',
+  TRANSACTIONS: 'noctis_prod_v1_transactions',
+  SUBCATEGORIES: 'noctis_prod_v1_subcategories',
+  NOTIFICATIONS: 'noctis_prod_v1_notifications',
+  SETTINGS: 'noctis_prod_v1_settings',
+  LOCKED: 'noctis_prod_v1_is_locked',
 };
 
+// Chaves legadas da etapa de protótipo que devem ser purgadas
+const LEGACY_STORAGE_KEYS = [
+  'noctis_transactions_v2',
+  'noctis_subcategories_v2',
+  'noctis_notifications_v2',
+  'noctis_settings_v2',
+  'noctis_is_locked_v2',
+];
+
 export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Limpeza imediata do cache anterior na inicialização
+  useEffect(() => {
+    LEGACY_STORAGE_KEYS.forEach(key => {
+      try {
+        localStorage.removeItem(key);
+      } catch (e) {
+        console.error('Erro ao purgar chave legada:', e);
+      }
+    });
+  }, []);
+
   // LocalStorage state initialization
   const [subcategories, setSubcategories] = useState<SubCategory[]>(() => {
     try {
@@ -123,7 +144,6 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   });
 
   const [pillars] = useState<MacroPillar[]>(MACRO_PILLARS);
-  const [monthlyHistory] = useState<MonthlyComparison[]>(MONTHLY_CHART_DATA);
   const [activeTab, setActiveTab] = useState<'home' | 'analysis' | 'categories' | 'transactions' | 'settings'>('home');
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
@@ -164,6 +184,46 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [settings]);
 
+  // Histórico Mensal calculado dinamicamente com base nas transações reais do usuário
+  const monthlyHistory = useMemo(() => {
+    if (transactions.length === 0) return [];
+    
+    const monthMap: Record<string, { income: number; expense: number; savings: number }> = {};
+    const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    
+    transactions.forEach(t => {
+      const date = t.dueDate || t.createdAt;
+      if (!date) return;
+      const [y, m] = date.split('-');
+      if (!y || !m) return;
+      const key = `${y}-${m}`;
+      if (!monthMap[key]) {
+        monthMap[key] = { income: 0, expense: 0, savings: 0 };
+      }
+      if (t.type === 'income') {
+        monthMap[key].income += t.amount;
+      } else if (t.type === 'savings') {
+        monthMap[key].savings += t.amount;
+      } else {
+        monthMap[key].expense += t.amount;
+      }
+    });
+
+    const sortedKeys = Object.keys(monthMap).sort();
+    return sortedKeys.map(key => {
+      const [, mStr] = key.split('-');
+      const mIdx = parseInt(mStr, 10) - 1;
+      const name = monthNames[mIdx] || key;
+      return {
+        month: name,
+        monthKey: key,
+        income: monthMap[key].income,
+        expense: monthMap[key].expense,
+        savings: monthMap[key].savings,
+      };
+    });
+  }, [transactions]);
+
   // Computed metrics
   const totalIncome = useMemo(() => {
     return transactions
@@ -194,9 +254,10 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return totalIncome - totalPaidExpenses - totalPendingExpenses - totalSaved;
   }, [totalIncome, totalPaidExpenses, totalPendingExpenses, totalSaved]);
 
-  const budgetLimit = settings.monthlyBudgetCeiling || 10000;
+  const budgetLimit = settings.monthlyBudgetCeiling || 0;
 
   const budgetUsedPercentage = useMemo(() => {
+    if (budgetLimit <= 0) return 0;
     const committed = totalPaidExpenses + totalPendingExpenses + totalSaved;
     return Math.min(Math.round((committed / budgetLimit) * 100), 100);
   }, [totalPaidExpenses, totalPendingExpenses, totalSaved, budgetLimit]);
@@ -322,6 +383,28 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   };
 
+  // Resetar todos os dados do App (Item 5)
+  const resetAllData = () => {
+    setTransactions([]);
+    setSubcategories([]);
+    setNotifications([]);
+    setSettings(DEFAULT_USER_SETTINGS);
+    Object.values(STORAGE_KEYS).forEach(k => {
+      try {
+        localStorage.removeItem(k);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+    LEGACY_STORAGE_KEYS.forEach(k => {
+      try {
+        localStorage.removeItem(k);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  };
+
   const testBrowserNotification = async (): Promise<boolean> => {
     if (!('Notification' in window)) {
       alert('Seu navegador atual não suporta notificações de sistema.');
@@ -354,8 +437,6 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const authenticateBiometrics = async (): Promise<boolean> => {
     if (window.PublicKeyCredential && window.navigator.credentials) {
       try {
-        // Preparado para WebAuthn se suportado pelo dispositivo
-        // Fallback rápido se não houver authenticator configurado
         setIsLocked(false);
         return true;
       } catch (err) {
@@ -401,6 +482,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         deleteTransaction,
         updateSettings,
         markAllNotificationsRead,
+        resetAllData,
         testBrowserNotification,
         authenticateBiometrics,
         unlockApp,

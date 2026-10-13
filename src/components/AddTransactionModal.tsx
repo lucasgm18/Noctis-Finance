@@ -11,6 +11,7 @@ export const AddTransactionModal: React.FC = () => {
     pillars, 
     subcategories, 
     addTransaction,
+    addSubCategory,
     settings 
   } = useFinance();
 
@@ -19,6 +20,8 @@ export const AddTransactionModal: React.FC = () => {
   const [type, setType] = useState<TransactionType>('expense');
   const [pillarId, setPillarId] = useState<MacroPillarId>('fixed');
   const [subCategoryId, setSubCategoryId] = useState('');
+  const [inlineSubName, setInlineSubName] = useState('');
+  const [isCreatingInlineSub, setIsCreatingInlineSub] = useState(false);
   const [recurrence, setRecurrence] = useState<RecurrenceType>('single');
   const [currentInstallment, setCurrentInstallment] = useState('1');
   const [totalInstallments, setTotalInstallments] = useState('10');
@@ -31,11 +34,8 @@ export const AddTransactionModal: React.FC = () => {
 
   if (!isAddModalOpen) return null;
 
-  // Filtra as subcategorias de acordo com o pilar selecionado (ou gerais de receita)
-  const currentSubcategories = subcategories.filter(s => {
-    if (type === 'income') return s.id.startsWith('sub-salario') || s.id.startsWith('sub-freelance') || s.id.startsWith('sub-rendimentos');
-    return s.pillarId === pillarId;
-  });
+  // Filtra as subcategorias de acordo com o pilar selecionado
+  const currentSubcategories = subcategories.filter(s => s.pillarId === pillarId);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +50,24 @@ export const AddTransactionModal: React.FC = () => {
       return;
     }
 
-    const effectiveSubCategory = subCategoryId || currentSubcategories[0]?.id || 'sub-moradia';
+    let effectiveSubCategory = subCategoryId;
+    if (type !== 'income') {
+      if (inlineSubName.trim() || currentSubcategories.length === 0) {
+        const subName = inlineSubName.trim() || title.trim();
+        const generatedId = `sub-${Date.now()}`;
+        addSubCategory({
+          name: subName,
+          pillarId,
+          iconName: 'Tag',
+          monthlyBudget: 0,
+        });
+        effectiveSubCategory = generatedId;
+      } else if (!effectiveSubCategory && currentSubcategories.length > 0) {
+        effectiveSubCategory = currentSubcategories[0].id;
+      }
+    } else {
+      effectiveSubCategory = 'income-default';
+    }
 
     addTransaction({
       title: title.trim(),
@@ -66,7 +83,7 @@ export const AddTransactionModal: React.FC = () => {
       paidDate: paid ? new Date().toISOString().split('T')[0] : undefined,
       notifyEnabled,
       notifyPush: notifyEnabled && notifyPush,
-      notifyEmail: notifyEnabled && notifyEmail,
+      notifyEmail: notifyEnabled && notifyEmail && !!settings.userEmail,
       notes: notes.trim() || undefined,
     });
 
@@ -74,6 +91,8 @@ export const AddTransactionModal: React.FC = () => {
     // Reset form
     setTitle('');
     setAmountStr('');
+    setInlineSubName('');
+    setIsCreatingInlineSub(false);
     setNotes('');
   };
 
@@ -202,20 +221,50 @@ export const AddTransactionModal: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#655A7C] mb-1">
-                  Subcategoria
-                </label>
-                <select
-                  value={subCategoryId}
-                  onChange={e => setSubCategoryId(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-white border border-[#DFD5C3] text-[#231942] text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
-                >
-                  {currentSubcategories.map(sub => (
-                    <option key={sub.id} value={sub.id}>
-                      {sub.name} (Teto: R$ {sub.monthlyBudget})
-                    </option>
-                  ))}
-                </select>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-bold text-[#655A7C]">
+                    Subcategoria
+                  </label>
+                  {currentSubcategories.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setIsCreatingInlineSub(!isCreatingInlineSub)}
+                      className="text-xs font-bold text-[#6E44FF] hover:underline flex items-center gap-1"
+                    >
+                      {isCreatingInlineSub ? 'Selecionar existente' : '+ Nova subcategoria'}
+                    </button>
+                  )}
+                </div>
+
+                {isCreatingInlineSub || currentSubcategories.length === 0 ? (
+                  <div className="space-y-1.5">
+                    <input
+                      type="text"
+                      placeholder="Nome da subcategoria (ex: Aluguel, Mercado, Ração)"
+                      value={inlineSubName}
+                      onChange={e => setInlineSubName(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-2xl bg-white border border-[#6E44FF] text-[#231942] text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#6E44FF] placeholder:text-[#655A7C]/50"
+                    />
+                    {currentSubcategories.length === 0 && (
+                      <p className="text-[11px] text-[#655A7C]">
+                        Nenhuma subcategoria neste pilar. Digite o nome para criá-la automaticamente.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <select
+                    value={subCategoryId}
+                    onChange={e => setSubCategoryId(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-2xl bg-white border border-[#DFD5C3] text-[#231942] text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+                  >
+                    <option value="">Selecione uma subcategoria</option>
+                    {currentSubcategories.map(sub => (
+                      <option key={sub.id} value={sub.id}>
+                        {sub.name} {sub.monthlyBudget > 0 ? `(Teto: R$ ${sub.monthlyBudget})` : ''}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
             </div>
           )}
@@ -342,7 +391,9 @@ export const AddTransactionModal: React.FC = () => {
                     className="rounded text-[#6E44FF] focus:ring-[#6E44FF]"
                   />
                   <Mail className="w-3.5 h-3.5 text-[#1F9D73]" />
-                  <span>E-mail ({settings.userEmail.split('@')[0]}@...)</span>
+                  <span>
+                    {settings.userEmail ? `E-mail (${settings.userEmail})` : 'E-mail (Definir em Ajustes)'}
+                  </span>
                 </label>
               </div>
             )}

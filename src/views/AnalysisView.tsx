@@ -11,11 +11,10 @@ import {
   Tooltip, 
   CartesianGrid 
 } from 'recharts';
-import { Calendar as CalendarIcon, BarChart3, ArrowUpRight, ArrowDownRight, Layers } from 'lucide-react';
+import { Calendar as CalendarIcon, BarChart3, ArrowUpRight, ArrowDownRight, Layers, Plus } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { formatCurrency } from '../utils/formatters';
 import { CalendarView } from '../components/CalendarView';
-import { DynamicIcon } from '../components/DynamicIcon';
 
 export const AnalysisView: React.FC = () => {
   const { 
@@ -24,11 +23,12 @@ export const AnalysisView: React.FC = () => {
     monthlyHistory, 
     totalIncome, 
     totalPaidExpenses,
-    totalPendingExpenses
+    totalPendingExpenses,
+    setIsAddModalOpen
   } = useFinance();
 
   const [activeSubTab, setActiveSubTab] = useState<'charts' | 'calendar'>('charts');
-  const [selectedPillarId, setSelectedPillarId] = useState<string | null>(null);
+  const [hoveredPillar, setHoveredPillar] = useState<{ id: string; name: string; fullName: string; value: number; color: string } | null>(null);
 
   // Prepara dados para o gráfico de Donut
   const donutData = pillars.map(p => ({
@@ -37,7 +37,6 @@ export const AnalysisView: React.FC = () => {
     fullName: p.name,
     value: pillarExpenses[p.id] || 0,
     color: p.color,
-    icon: p.iconName,
   })).filter(d => d.value > 0);
 
   const totalCommitted = totalPaidExpenses + totalPendingExpenses;
@@ -88,80 +87,118 @@ export const AnalysisView: React.FC = () => {
                 <Layers className="w-4 h-4 text-[#6E44FF]" />
                 <span>Distribuição pelos 5 Pilares Macro</span>
               </h3>
-              <p className="text-xs text-[#655A7C]">Proporção de gastos e reservas do mês</p>
+              <p className="text-xs text-[#655A7C]">Passe o mouse ou toque nas fatias para detalhar</p>
             </div>
 
             {/* Donut Chart Container */}
             <div className="h-64 sm:h-72 w-full relative flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Tooltip
-                    formatter={(value: any) => [formatCurrency(Number(value) || 0), 'Comprometido']}
-                    contentStyle={{
-                      backgroundColor: '#FCF9F2',
-                      border: '1px solid #DFD5C3',
-                      borderRadius: '16px',
-                      fontSize: '12px',
-                      fontWeight: 'bold',
-                      color: '#231942',
-                    }}
-                  />
                   <Pie
-                    data={donutData}
+                    data={donutData.length > 0 ? donutData : [{ id: 'empty', name: 'Sem dados', fullName: 'Sem gastos', value: 1, color: '#DFD5C3' }]}
                     cx="50%"
                     cy="50%"
-                    innerRadius={70}
-                    outerRadius={105}
-                    paddingAngle={4}
+                    innerRadius={72}
+                    outerRadius={106}
+                    paddingAngle={donutData.length > 0 ? 4 : 0}
                     dataKey="value"
+                    onMouseEnter={(_, index) => {
+                      if (donutData[index]) {
+                        setHoveredPillar(donutData[index]);
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      setHoveredPillar(null);
+                    }}
                   >
-                    {donutData.map(entry => (
-                      <Cell 
-                        key={entry.id} 
-                        fill={entry.color} 
-                        stroke="#FCF9F2" 
-                        strokeWidth={3}
-                        className="cursor-pointer transition-transform hover:opacity-80"
-                        onClick={() => setSelectedPillarId(entry.id)}
-                      />
-                    ))}
+                    {donutData.length > 0 ? (
+                      donutData.map(entry => (
+                        <Cell 
+                          key={entry.id} 
+                          fill={entry.color} 
+                          stroke="#FCF9F2" 
+                          strokeWidth={3}
+                          className="cursor-pointer transition-transform hover:opacity-80"
+                        />
+                      ))
+                    ) : (
+                      <Cell fill="#DFD5C3" stroke="#FCF9F2" strokeWidth={3} />
+                    )}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
 
-              {/* Center Donut Label */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-[11px] font-bold text-[#655A7C] uppercase tracking-wider">Total Mês</span>
-                <span className="text-lg sm:text-xl font-black text-[#231942]">
-                  {formatCurrency(totalCommitted)}
-                </span>
+              {/* Centro do Donut Dinâmico (Sem sobreposição!) */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none transition-all">
+                {hoveredPillar ? (
+                  <div className="flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-150 px-2">
+                    <span className="text-[11px] font-bold text-[#655A7C] uppercase tracking-wider truncate max-w-[140px]">
+                      {hoveredPillar.name}
+                    </span>
+                    <span className="text-base sm:text-xl font-black text-[#231942]">
+                      {formatCurrency(hoveredPillar.value)}
+                    </span>
+                    <span 
+                      className="text-[10px] font-extrabold px-2 py-0.5 rounded-full mt-1 text-white shadow-sm"
+                      style={{ backgroundColor: hoveredPillar.color }}
+                    >
+                      {totalCommitted > 0 ? Math.round((hoveredPillar.value / totalCommitted) * 100) : 0}% do total
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center text-center">
+                    <span className="text-[11px] font-bold text-[#655A7C] uppercase tracking-wider">
+                      {totalCommitted > 0 ? 'Total Comprometido' : 'Sem Despesas'}
+                    </span>
+                    <span className="text-base sm:text-xl font-black text-[#231942]">
+                      {formatCurrency(totalCommitted)}
+                    </span>
+                    <span className="text-[10px] text-[#655A7C] font-semibold mt-0.5">
+                      {totalCommitted > 0 ? 'Passe o mouse na fatia' : 'R$ 0,00 registrado'}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Custom Legend for 5 Pillars */}
-            <div className="space-y-2 mt-2 pt-3 border-t border-[#DFD5C3]">
-              {donutData.map(item => {
-                const pct = totalCommitted > 0 ? Math.round((item.value / totalCommitted) * 100) : 0;
-                return (
-                  <div
-                    key={item.id}
-                    onClick={() => setSelectedPillarId(item.id)}
-                    className="flex items-center justify-between p-2 rounded-xl hover:bg-[#EDE5D5]/50 transition-colors cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                      <span className="text-xs font-bold text-[#231942]">{item.name}</span>
+            {/* Custom Legend for 5 Pillars or Empty state */}
+            {donutData.length === 0 ? (
+              <div className="py-4 text-center border-t border-[#DFD5C3]">
+                <p className="text-xs text-[#655A7C]">Nenhum gasto registrado para gerar a distribuição dos pilares.</p>
+                <button
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="mt-2 text-xs font-bold text-[#6E44FF] hover:underline inline-flex items-center gap-1"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Cadastrar primeiro lançamento</span>
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2 mt-2 pt-3 border-t border-[#DFD5C3]">
+                {donutData.map(item => {
+                  const pct = totalCommitted > 0 ? Math.round((item.value / totalCommitted) * 100) : 0;
+                  return (
+                    <div
+                      key={item.id}
+                      onMouseEnter={() => setHoveredPillar(item)}
+                      onMouseLeave={() => setHoveredPillar(null)}
+                      className="flex items-center justify-between p-2 rounded-xl hover:bg-[#EDE5D5]/50 transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                        <span className="text-xs font-bold text-[#231942]">{item.name}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-bold text-[#231942]">{formatCurrency(item.value)}</span>
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#EDE5D5] text-[#655A7C] min-w-[42px] text-center">
+                          {pct}%
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold text-[#231942]">{formatCurrency(item.value)}</span>
-                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#EDE5D5] text-[#655A7C] min-w-[42px] text-center">
-                        {pct}%
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Card 2: Comparativo Mensal Entradas vs Saídas */}
@@ -170,7 +207,7 @@ export const AnalysisView: React.FC = () => {
               <div className="flex items-center justify-between mb-2">
                 <div>
                   <h3 className="text-base font-bold text-[#231942]">Entradas vs Saídas por Mês</h3>
-                  <p className="text-xs text-[#655A7C]">Histórico de fluxo de caixa recente</p>
+                  <p className="text-xs text-[#655A7C]">Histórico de fluxo de caixa</p>
                 </div>
               </div>
 
@@ -179,43 +216,53 @@ export const AnalysisView: React.FC = () => {
                 <div className="p-3 rounded-2xl bg-[#E1F7EF] border border-[#1F9D73]/20 flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#1F9D73]">
                     <ArrowUpRight className="w-4 h-4" />
-                    <span>Entradas Médias</span>
+                    <span>Entradas Totais</span>
                   </div>
-                  <span className="text-xs font-extrabold text-[#1F9D73]">R$ 10.500</span>
+                  <span className="text-xs font-extrabold text-[#1F9D73]">{formatCurrency(totalIncome)}</span>
                 </div>
                 <div className="p-3 rounded-2xl bg-[#FDE8E5] border border-[#E0533C]/20 flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#E0533C]">
                     <ArrowDownRight className="w-4 h-4" />
-                    <span>Saídas Médias</span>
+                    <span>Saídas Totais</span>
                   </div>
-                  <span className="text-xs font-extrabold text-[#E0533C]">R$ 5.100</span>
+                  <span className="text-xs font-extrabold text-[#E0533C]">{formatCurrency(totalPaidExpenses)}</span>
                 </div>
               </div>
             </div>
 
-            {/* Bar Chart Container */}
-            <div className="h-64 sm:h-72 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#DFD5C3" opacity={0.6} />
-                  <XAxis dataKey="month" tick={{ fill: '#655A7C', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: '#655A7C', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000}k`} />
-                  <Tooltip
-                    formatter={(val: any) => [formatCurrency(Number(val) || 0)]}
-                    contentStyle={{
-                      backgroundColor: '#FCF9F2',
-                      border: '1px solid #DFD5C3',
-                      borderRadius: '16px',
-                      fontSize: '12px',
-                      fontWeight: 'bold',
-                      color: '#231942',
-                    }}
-                  />
-                  <Bar dataKey="income" name="Entradas" fill="#1F9D73" radius={[6, 6, 0, 0]} maxBarSize={28} />
-                  <Bar dataKey="expense" name="Saídas" fill="#6E44FF" radius={[6, 6, 0, 0]} maxBarSize={28} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            {/* Bar Chart Container / Empty State */}
+            {monthlyHistory.length === 0 ? (
+              <div className="h-64 sm:h-72 w-full flex flex-col items-center justify-center text-center p-6 bg-[#EDE5D5]/30 rounded-2xl border border-dashed border-[#DFD5C3]">
+                <BarChart3 className="w-10 h-10 text-[#655A7C]/50 mb-2" />
+                <p className="text-sm font-bold text-[#231942]">Nenhum histórico mensal registrado</p>
+                <p className="text-xs text-[#655A7C] max-w-xs mt-1">
+                  Conforme você cadastrar seus lançamentos e receitas, o comparativo mensal será traçado automaticamente aqui.
+                </p>
+              </div>
+            ) : (
+              <div className="h-64 sm:h-72 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={monthlyHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#DFD5C3" opacity={0.6} />
+                    <XAxis dataKey="month" tick={{ fill: '#655A7C', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: '#655A7C', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000}k`} />
+                    <Tooltip
+                      formatter={(val: any) => [formatCurrency(Number(val) || 0)]}
+                      contentStyle={{
+                        backgroundColor: '#FCF9F2',
+                        border: '1px solid #DFD5C3',
+                        borderRadius: '16px',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        color: '#231942',
+                      }}
+                    />
+                    <Bar dataKey="income" name="Entradas" fill="#1F9D73" radius={[6, 6, 0, 0]} maxBarSize={28} />
+                    <Bar dataKey="expense" name="Saídas" fill="#6E44FF" radius={[6, 6, 0, 0]} maxBarSize={28} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
 
             {/* Bar Chart Legend */}
             <div className="flex items-center justify-center gap-6 pt-3 border-t border-[#DFD5C3] text-xs font-bold text-[#655A7C]">

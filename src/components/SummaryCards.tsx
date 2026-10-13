@@ -8,18 +8,18 @@ export const SummaryCards: React.FC = () => {
     totalIncome, 
     totalPaidExpenses, 
     totalPendingExpenses, 
-    realFreeSavings,
     totalSaved,
+    realFreeSavings,
     pillarExpenses,
     deviceViewMode,
+    settings,
   } = useFinance();
 
   const isMockup = deviceViewMode === 'mobile-mockup';
 
-  // Meta de reserva fictícia para o progresso do card FinWise
-  const emergencyGoal = 15000;
-  const currentEmergencySaved = 6200 + totalSaved;
-  const emergencyPercentage = Math.min(Math.round((currentEmergencySaved / emergencyGoal) * 100), 100);
+  const emergencyGoal = settings.emergencyGoal || 0;
+  const currentEmergencySaved = totalSaved;
+  const emergencyPercentage = emergencyGoal > 0 ? Math.min(Math.round((currentEmergencySaved / emergencyGoal) * 100), 100) : 0;
 
   return (
     <div className="space-y-5">
@@ -37,7 +37,7 @@ export const SummaryCards: React.FC = () => {
             {formatCurrency(totalIncome)}
           </div>
           <div className="text-[11px] font-semibold text-[#1F9D73] mt-1 flex items-center gap-1">
-            <span>● 100% recebido</span>
+            <span>{totalIncome > 0 ? '● Recebido no mês' : 'Nenhuma entrada'}</span>
           </div>
         </div>
 
@@ -129,7 +129,9 @@ export const SummaryCards: React.FC = () => {
               </div>
               <h3 className="text-lg font-bold text-white">Reserva de Emergência</h3>
               <p className="text-xs text-[#E5DEFF]/90">
-                {emergencyPercentage}% concluído • Meta {formatCurrency(emergencyGoal)}
+                {emergencyGoal > 0 
+                  ? `${emergencyPercentage}% concluído • Meta ${formatCurrency(emergencyGoal)}`
+                  : 'Meta não definida • Configure em Alertas & Ajustes'}
               </p>
             </div>
           </div>
@@ -139,7 +141,7 @@ export const SummaryCards: React.FC = () => {
             <div>
               <div className="text-xs text-[#E5DEFF] font-medium">Aportado este mês</div>
               <div className="text-base sm:text-lg font-bold text-white">
-                {formatCurrency(pillarExpenses.wealth || 2000)}
+                {formatCurrency(pillarExpenses.wealth || 0)}
               </div>
             </div>
             <div>
