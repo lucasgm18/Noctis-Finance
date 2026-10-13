@@ -23,29 +23,32 @@ export const Header: React.FC = () => {
   const totalCommittedExpenses = totalPaidExpenses + totalPendingExpenses;
 
   return (
-    <header className="bg-[#6E44FF] text-white pt-6 pb-9 px-5 sm:px-8 transition-all">
+    <header className="bg-[#6E44FF] text-white pt-12 sm:pt-6 pb-9 px-4 sm:px-8 transition-all relative overflow-hidden">
+      {/* Subtle light glow behind header */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+
       {/* Top Bar: User Greeting + Actions */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 relative z-10">
         <div className="flex items-center gap-3">
-          <NoctisLogo className="w-11 h-11 rounded-2xl shadow-md border border-white/20" />
-          <div>
-            <div className="flex items-center gap-2 mb-0.5">
+          <NoctisLogo className="w-11 h-11 rounded-2xl shadow-md border border-white/20 shrink-0" />
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
               <span className="text-[11px] uppercase tracking-wider text-[#E5DEFF] font-bold">Noctis Finanças</span>
               <SyncBadge variant="header" />
             </div>
-            <h1 className="text-xl font-extrabold tracking-tight text-white">
+            <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-white truncate">
               {settings.userName ? `Olá, ${settings.userName} 👋` : 'Bem-vindo 👋'}
             </h1>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {/* Quick Lock Button */}
           <button
             onClick={lockApp}
             title="Bloquear aplicativo (Biometria)"
-            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors border border-white/15"
+            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md flex items-center justify-center transition-all border border-white/20 active:scale-95 shadow-sm"
           >
             <Lock className="w-4 h-4 text-[#E5DEFF]" />
           </button>
@@ -54,7 +57,7 @@ export const Header: React.FC = () => {
           <button
             onClick={() => setActiveTab('settings')}
             title="Configurações & Notificações"
-            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors border border-white/15"
+            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md flex items-center justify-center transition-all border border-white/20 active:scale-95 shadow-sm"
           >
             <Sliders className="w-4 h-4 text-[#E5DEFF]" />
           </button>
@@ -63,7 +66,7 @@ export const Header: React.FC = () => {
           <button
             onClick={() => setIsNotificationOpen(true)}
             title="Central de Notificações"
-            className="relative w-10 h-10 rounded-full bg-white hover:bg-[#FCF9F2] text-[#231942] flex items-center justify-center transition-transform active:scale-95 shadow-md"
+            className="relative w-10 h-10 rounded-full bg-white/95 hover:bg-white backdrop-blur-md text-[#231942] flex items-center justify-center transition-all active:scale-90 shadow-md hover:shadow-lg"
           >
             <Bell className="w-5 h-5 text-[#231942]" />
             {unreadNotificationsCount > 0 && (
@@ -76,28 +79,28 @@ export const Header: React.FC = () => {
       </div>
 
       {/* FinWise Balance & Expense Grid */}
-      <div className="grid grid-cols-2 gap-3 pt-2 pb-5 border-b border-white/15">
-        <div>
+      <div className="grid grid-cols-2 gap-3 pt-2 pb-5 border-b border-white/15 relative z-10">
+        <div className="min-w-0">
           <div className="flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-[#E5DEFF] mb-1">
-            <span className="p-0.5 rounded-full bg-white/10 text-white">
+            <span className="p-0.5 rounded-full bg-white/10 text-white shrink-0">
               <ArrowUpRight className="w-3 h-3 text-[#1F9D73]" />
             </span>
-            <span>Total Entradas</span>
+            <span className="truncate">Total Entradas</span>
           </div>
-          <div className="text-sm xs:text-base sm:text-2xl lg:text-3xl font-black tracking-tight text-white">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-white whitespace-nowrap">
             {formatCurrency(totalIncome)}
           </div>
         </div>
 
-        <div className="border-l border-white/15 pl-3">
+        <div className="border-l border-white/15 pl-3 min-w-0">
           <div className="flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-[#E5DEFF] mb-1">
-            <span className="p-0.5 rounded-full bg-white/10 text-white">
+            <span className="p-0.5 rounded-full bg-white/10 text-white shrink-0">
               <ArrowDownRight className="w-3 h-3 text-[#E0533C]" />
             </span>
             <span className="truncate">Saídas & Dívidas</span>
           </div>
-          <div className="text-sm xs:text-base sm:text-2xl lg:text-3xl font-black tracking-tight text-[#E5DEFF]">
-            -{formatCurrency(totalCommittedExpenses)}
+          <div className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-[#E5DEFF] whitespace-nowrap">
+            - {formatCurrency(totalCommittedExpenses)}
           </div>
         </div>
       </div>

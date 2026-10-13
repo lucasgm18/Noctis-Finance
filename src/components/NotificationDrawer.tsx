@@ -34,8 +34,8 @@ export const NotificationDrawer: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-[#231942]/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full max-w-md bg-[#FCF9F2] h-full shadow-2xl flex flex-col justify-between border-l border-[#DFD5C3] p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex justify-end bg-[#231942]/65 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="w-full max-w-md bg-[#FCF9F2]/95 backdrop-blur-2xl h-full shadow-[0_0_50px_rgba(35,25,66,0.25)] flex flex-col justify-between border-l border-white/80 p-6 overflow-y-auto">
         {/* Top Header */}
         <div>
           <div className="flex items-center justify-between pb-4 border-b border-[#DFD5C3]">

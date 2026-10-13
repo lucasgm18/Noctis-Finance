@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, ChevronRight, X, Sparkles, Filter } from 'lucide-react';
+import { Plus, Trash2, Filter, Layers, DollarSign } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
-import { MacroPillarId, SubCategory } from '../types/finance';
+import { MacroPillarId } from '../types/finance';
 import { formatCurrency, formatDateBR } from '../utils/formatters';
-import { DynamicIcon, AVAILABLE_ICON_NAMES } from '../components/DynamicIcon';
+import { DynamicIcon } from '../components/DynamicIcon';
 
 export const CategoriesView: React.FC = () => {
   const { 
@@ -14,14 +14,17 @@ export const CategoriesView: React.FC = () => {
     pillarBudgets,
     addSubCategory,
     deleteSubCategory,
+    togglePaid,
     setIsAddModalOpen,
-    togglePaid
+    deviceViewMode
   } = useFinance();
+
+  const isMobile = deviceViewMode === 'mobile-mockup';
 
   const [selectedPillarId, setSelectedPillarId] = useState<MacroPillarId>('fixed');
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState<string | null>(null);
-  
-  // Modal de Criação de Nova Subcategoria
+
+  // Modal de Nova Subcategoria
   const [isNewSubModalOpen, setIsNewSubModalOpen] = useState(false);
   const [newSubName, setNewSubName] = useState('');
   const [newSubBudget, setNewSubBudget] = useState('500');
@@ -29,19 +32,20 @@ export const CategoriesView: React.FC = () => {
   const [targetPillarForNew, setTargetPillarForNew] = useState<MacroPillarId>('fixed');
 
   const selectedPillar = pillars.find(p => p.id === selectedPillarId) || pillars[0];
-
-  // Subcategorias do pilar ativo
   const currentSubcategories = subcategories.filter(s => s.pillarId === selectedPillarId);
 
-  // Gastos por subcategoria
-  const subCategorySpentMap: Record<string, number> = {};
-  transactions.forEach(t => {
-    if (t.subCategoryId) {
-      subCategorySpentMap[t.subCategoryId] = (subCategorySpentMap[t.subCategoryId] || 0) + t.amount;
-    }
-  });
+  // Gastos por subcategoria no pilar selecionado
+  const subCategorySpentMap = React.useMemo(() => {
+    const map: Record<string, number> = {};
+    transactions.forEach(t => {
+      if (t.subCategoryId && t.pillarId === selectedPillarId) {
+        map[t.subCategoryId] = (map[t.subCategoryId] || 0) + t.amount;
+      }
+    });
+    return map;
+  }, [transactions, selectedPillarId]);
 
-  // Transações filtradas
+  // Lançamentos filtrados pelo pilar e subcategoria
   const filteredTransactions = transactions.filter(t => {
     if (selectedSubCategoryId) {
       return t.subCategoryId === selectedSubCategoryId;
@@ -68,7 +72,7 @@ export const CategoriesView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[#FCF9F2] p-5 rounded-[28px] border border-[#DFD5C3]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[#FCF9F2]/75 backdrop-blur-xl p-5 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] transition-all duration-300">
         <div>
           <h2 className="text-xl font-extrabold text-[#231942]">5 Pilares & Subcategorias</h2>
           <p className="text-xs text-[#655A7C]">Estrutura orçamentária com tetos personalizados</p>
@@ -79,19 +83,24 @@ export const CategoriesView: React.FC = () => {
             setTargetPillarForNew(selectedPillarId);
             setIsNewSubModalOpen(true);
           }}
-          className="py-2.5 px-4 rounded-2xl bg-[#6E44FF] hover:bg-[#5A32E6] text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition-all"
+          className="py-2.5 px-4 rounded-2xl bg-[#6E44FF] hover:bg-[#5A32E6] text-white text-xs font-bold shadow-md hover:shadow-lg flex items-center gap-1.5 transition-all duration-200 active:scale-95"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
           <span>Criar Nova Subcategoria</span>
         </button>
       </div>
 
-      {/* Grid com os 5 Pilares Macro */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      {/* Grid / Carrossel dos 5 Pilares Macro (Item 1.3) */}
+      <div className={
+        isMobile
+          ? "flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 no-scrollbar scrollbar-none"
+          : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"
+      }>
         {pillars.map(pillar => {
           const spent = pillarExpenses[pillar.id] || 0;
-          const budget = pillarBudgets[pillar.id] || 1;
-          const pct = Math.min(Math.round((spent / budget) * 100), 100);
+          const budget = pillarBudgets[pillar.id] || 0;
+          const hasBudget = budget > 0;
+          const pct = hasBudget ? Math.min(Math.round((spent / budget) * 100), 100) : 0;
           const isSelected = selectedPillarId === pillar.id;
 
           return (
@@ -101,33 +110,40 @@ export const CategoriesView: React.FC = () => {
                 setSelectedPillarId(pillar.id);
                 setSelectedSubCategoryId(null);
               }}
-              className={`p-4 rounded-[24px] text-left transition-all relative border flex flex-col justify-between ${
+              className={`p-4 rounded-[24px] text-left transition-all duration-300 relative overflow-hidden border flex flex-col justify-between active:scale-[0.98] ${
+                isMobile ? 'min-w-[175px] shrink-0 snap-start' : ''
+              } ${
                 isSelected
-                  ? 'bg-white border-[#6E44FF] shadow-lg scale-[1.02] ring-2 ring-[#6E44FF]/20'
-                  : 'bg-[#FCF9F2] hover:bg-[#EDE5D5]/50 border-[#DFD5C3]'
-              }`}
+                  ? 'bg-white border-[#6E44FF] shadow-lg scale-[1.02] ring-2 ring-[#6E44FF]/25'
+                  : 'bg-[#FCF9F2]/75 backdrop-blur-xl hover:bg-white/90 hover:border-[#6E44FF]/45 hover:-translate-y-1 hover:shadow-[0_14px_34px_rgba(110,68,255,0.14)] border-white/70'
+              } before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:via-transparent before:to-[#6E44FF]/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:pointer-events-none`}
             >
-              <div>
+              <div className="relative z-10 w-full">
                 <div
-                  className="w-10 h-10 rounded-2xl flex items-center justify-center mb-3 shadow-sm"
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center mb-3 shadow-sm transition-transform duration-300 hover:scale-110"
                   style={{ backgroundColor: pillar.softBg, color: pillar.color }}
                 >
                   <DynamicIcon name={pillar.iconName} className="w-5 h-5" />
                 </div>
-                <h4 className="text-xs font-bold text-[#231942] leading-tight line-clamp-2">
+                <h4 className="text-xs font-bold text-[#231942] leading-tight">
                   {pillar.shortName}
                 </h4>
               </div>
 
-              <div className="mt-4 pt-2 border-t border-[#DFD5C3]/60">
+              {/* Teto do Pilar (Item 2.4 - Sem Teto R$ 1,00) */}
+              <div className="mt-4 pt-2 border-t border-[#DFD5C3]/60 relative z-10 w-full">
                 <div className="text-xs font-extrabold text-[#231942]">
                   {formatCurrency(spent)}
                 </div>
                 <div className="flex items-center justify-between text-[10px] text-[#655A7C] mt-1 font-semibold">
-                  <span>Teto {formatCurrency(budget)}</span>
-                  <span className={pct > 90 ? 'text-[#E0533C]' : 'text-[#1F9D73]'}>{pct}%</span>
+                  <span className="truncate max-w-[115px]">
+                    {hasBudget ? `Teto ${formatCurrency(budget)}` : 'Sem teto definido'}
+                  </span>
+                  <span className={pct > 90 ? 'text-[#E0533C]' : 'text-[#1F9D73]'}>
+                    {hasBudget ? `${pct}%` : '-'}
+                  </span>
                 </div>
-                <div className="w-full h-1.5 bg-[#EDE5D5] rounded-full mt-1.5 overflow-hidden">
+                <div className="w-full h-1.5 bg-[#EDE5D5]/80 rounded-full mt-1.5 overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{
@@ -143,11 +159,11 @@ export const CategoriesView: React.FC = () => {
       </div>
 
       {/* Subcategorias do Pilar Selecionado */}
-      <div className="bg-[#FCF9F2] p-5 sm:p-6 rounded-[28px] border border-[#DFD5C3] shadow-soft space-y-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-[#DFD5C3]">
+      <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] space-y-4 transition-all duration-300">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-[#DFD5C3]/70">
           <div>
             <h3 className="text-lg font-bold text-[#231942] flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: selectedPillar.color }} />
+              <span className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: selectedPillar.color }} />
               <span>Subcategorias de {selectedPillar.name}</span>
             </h3>
             <p className="text-xs text-[#655A7C]">{selectedPillar.description}</p>
@@ -156,7 +172,7 @@ export const CategoriesView: React.FC = () => {
           {selectedSubCategoryId && (
             <button
               onClick={() => setSelectedSubCategoryId(null)}
-              className="text-xs font-bold text-[#6E44FF] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-[#6E44FF] hover:underline flex items-center gap-1 active:scale-95 transition-all"
             >
               <Filter className="w-3.5 h-3.5" />
               <span>Remover filtro de subcategoria</span>
@@ -166,7 +182,7 @@ export const CategoriesView: React.FC = () => {
 
         {/* Subcategories Horizontal / Grid pills */}
         {currentSubcategories.length === 0 ? (
-          <div className="py-10 text-center text-[#655A7C] bg-[#EDE5D5]/30 rounded-2xl border border-dashed border-[#DFD5C3]">
+          <div className="py-10 text-center text-[#655A7C] bg-white/50 rounded-2xl border border-dashed border-[#DFD5C3]">
             <p className="font-bold text-[#231942] text-sm">Nenhuma subcategoria cadastrada ainda</p>
             <p className="text-xs text-[#655A7C] mt-1 mb-4">
               Crie subcategorias para organizar seus custos dentro de {selectedPillar.shortName}.
@@ -176,33 +192,34 @@ export const CategoriesView: React.FC = () => {
                 setTargetPillarForNew(selectedPillarId);
                 setIsNewSubModalOpen(true);
               }}
-              className="py-2.5 px-4 rounded-xl bg-[#6E44FF] hover:bg-[#5A32E6] text-white text-xs font-bold shadow-sm inline-flex items-center gap-1.5 transition-all"
+              className="py-2.5 px-4 rounded-xl bg-[#6E44FF] hover:bg-[#5A32E6] text-white text-xs font-bold shadow-sm inline-flex items-center gap-1.5 active:scale-95 transition-all"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Criar Primeira Subcategoria</span>
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'} gap-3`}>
             {currentSubcategories.map(sub => {
               const spent = subCategorySpentMap[sub.id] || 0;
-              const pct = sub.monthlyBudget > 0 ? Math.min(Math.round((spent / sub.monthlyBudget) * 100), 100) : 0;
+              const hasSubBudget = sub.monthlyBudget > 0;
+              const pct = hasSubBudget ? Math.min(Math.round((spent / sub.monthlyBudget) * 100), 100) : 0;
               const isSelected = selectedSubCategoryId === sub.id;
 
               return (
                 <div
                   key={sub.id}
                   onClick={() => setSelectedSubCategoryId(isSelected ? null : sub.id)}
-                  className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+                  className={`p-3.5 rounded-2xl border transition-all duration-300 cursor-pointer flex flex-col justify-between active:scale-[0.98] ${
                     isSelected
-                      ? 'bg-[#E5DEFF]/70 border-[#6E44FF] shadow-sm'
-                      : 'bg-white hover:bg-[#EDE5D5]/50 border-[#DFD5C3]'
+                      ? 'bg-[#E5DEFF]/80 border-[#6E44FF] shadow-md ring-2 ring-[#6E44FF]/20'
+                      : 'bg-white/90 backdrop-blur-sm hover:bg-white hover:border-[#6E44FF]/40 hover:-translate-y-0.5 hover:shadow-md border-[#DFD5C3]'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div
-                        className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                        className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
                         style={{ backgroundColor: selectedPillar.softBg, color: selectedPillar.color }}
                       >
                         <DynamicIcon name={sub.iconName} className="w-4 h-4" />
@@ -217,7 +234,7 @@ export const CategoriesView: React.FC = () => {
                           deleteSubCategory(sub.id);
                         }
                       }}
-                      className="text-[#655A7C] hover:text-[#E0533C] p-1 transition-colors"
+                      className="text-[#655A7C] hover:text-[#E0533C] p-1.5 rounded-lg hover:bg-rose-50 transition-all active:scale-90"
                       title="Excluir subcategoria"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -227,10 +244,12 @@ export const CategoriesView: React.FC = () => {
                   <div className="mt-3 pt-2 border-t border-[#DFD5C3]/40 flex items-center justify-between text-xs">
                     <div>
                       <span className="font-extrabold text-[#231942]">{formatCurrency(spent)}</span>
-                      <span className="text-[10px] text-[#655A7C] ml-1">/ teto {formatCurrency(sub.monthlyBudget)}</span>
+                      <span className="text-[10px] text-[#655A7C] ml-1">
+                        {hasSubBudget ? `/ teto ${formatCurrency(sub.monthlyBudget)}` : '(sem teto)'}
+                      </span>
                     </div>
                     <span className={`text-[11px] font-bold ${pct > 90 ? 'text-[#E0533C]' : 'text-[#655A7C]'}`}>
-                      {pct}%
+                      {hasSubBudget ? `${pct}%` : '-'}
                     </span>
                   </div>
                 </div>
@@ -241,7 +260,7 @@ export const CategoriesView: React.FC = () => {
       </div>
 
       {/* Lista de Lançamentos da Categoria / Subcategoria Filtrada */}
-      <div className="bg-[#FCF9F2] p-5 sm:p-6 rounded-[28px] border border-[#DFD5C3] shadow-soft">
+      <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] transition-all duration-300">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h4 className="text-base font-bold text-[#231942]">
@@ -252,7 +271,7 @@ export const CategoriesView: React.FC = () => {
 
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="py-1.5 px-3 rounded-xl bg-[#EDE5D5] hover:bg-[#DFD5C3] text-xs font-bold text-[#231942] flex items-center gap-1.5 transition-colors"
+            className="py-1.5 px-3 rounded-xl bg-[#EDE5D5] hover:bg-[#DFD5C3] text-xs font-bold text-[#231942] flex items-center gap-1.5 active:scale-95 transition-all shadow-sm"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Adicionar Neste Pilar</span>
@@ -260,7 +279,7 @@ export const CategoriesView: React.FC = () => {
         </div>
 
         {filteredTransactions.length === 0 ? (
-          <div className="py-8 text-center text-xs text-[#655A7C] bg-[#EDE5D5]/40 rounded-2xl border border-dashed border-[#DFD5C3]">
+          <div className="py-8 text-center text-xs text-[#655A7C] bg-white/50 rounded-2xl border border-dashed border-[#DFD5C3]">
             Nenhum lançamento registrado nesta categoria para este período.
           </div>
         ) : (
@@ -268,7 +287,7 @@ export const CategoriesView: React.FC = () => {
             {filteredTransactions.map(tx => (
               <div
                 key={tx.id}
-                className="flex items-center justify-between p-3 rounded-2xl bg-white border border-[#DFD5C3]"
+                className="flex items-center justify-between p-3.5 rounded-2xl bg-white/90 backdrop-blur-sm border border-[#DFD5C3] hover:border-[#6E44FF]/40 hover:-translate-y-0.5 hover:shadow-md transition-all active:scale-[0.99]"
               >
                 <div>
                   <h5 className="font-bold text-xs sm:text-sm text-[#231942]">{tx.title}</h5>
@@ -278,14 +297,14 @@ export const CategoriesView: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="font-extrabold text-xs sm:text-sm text-[#231942]">
+                  <span className="font-extrabold text-xs sm:text-sm text-[#231942] whitespace-nowrap">
                     {formatCurrency(tx.amount)}
                   </span>
                   <button
                     onClick={() => togglePaid(tx.id)}
-                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-colors ${
+                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-sm ${
                       tx.paid
-                        ? 'bg-[#E1F7EF] text-[#1F9D73]'
+                        ? 'bg-[#E1F7EF] text-[#1F9D73] hover:bg-[#d0f2e5]'
                         : 'bg-[#EDE5D5] text-[#D97706] hover:bg-[#FEF3C7]'
                     }`}
                   >
@@ -298,27 +317,19 @@ export const CategoriesView: React.FC = () => {
         )}
       </div>
 
-      {/* Modal Nova Subcategoria Dinâmica */}
+      {/* Modal Criar Nova Subcategoria */}
       {isNewSubModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#231942]/60 backdrop-blur-sm">
-          <div className="bg-[#FCF9F2] w-full max-w-md rounded-[32px] border border-[#DFD5C3] shadow-2xl p-6 relative">
-            <div className="flex items-center justify-between pb-3 border-b border-[#DFD5C3]">
-              <h3 className="text-lg font-bold text-[#231942]">Nova Subcategoria</h3>
-              <button
-                onClick={() => setIsNewSubModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-[#EDE5D5] flex items-center justify-center"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#231942]/60 backdrop-blur-md">
+          <div className="bg-[#FCF9F2]/95 backdrop-blur-2xl rounded-[32px] border border-white/80 p-6 w-full max-w-md shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-black text-[#231942]">Criar Nova Subcategoria</h3>
 
-            <form onSubmit={handleCreateSubcategory} className="mt-4 space-y-4">
+            <form onSubmit={handleCreateSubcategory} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-bold text-[#655A7C] mb-1">Pilar Financeiro</label>
+                <label className="block text-xs font-bold text-[#655A7C] mb-1">Pilar de Destino</label>
                 <select
                   value={targetPillarForNew}
                   onChange={e => setTargetPillarForNew(e.target.value as MacroPillarId)}
-                  className="w-full px-3 py-2 rounded-xl bg-white border border-[#DFD5C3] text-xs font-bold"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-white/90 border border-[#DFD5C3] text-xs font-bold text-[#231942] focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
                 >
                   {pillars.map(p => (
                     <option key={p.id} value={p.id}>{p.name}</option>
@@ -327,14 +338,14 @@ export const CategoriesView: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#655A7C] mb-1">Nome da Subcategoria *</label>
+                <label className="block text-xs font-bold text-[#655A7C] mb-1">Nome da Subcategoria</label>
                 <input
                   type="text"
                   required
-                  placeholder="Ex: Ração e Cuidados Especiais, Cursos"
+                  placeholder="Ex: Ração e Areia de Gato"
                   value={newSubName}
                   onChange={e => setNewSubName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-white border border-[#DFD5C3] text-xs font-semibold"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-white/90 border border-[#DFD5C3] text-sm font-semibold text-[#231942] focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
                 />
               </div>
 
@@ -342,40 +353,48 @@ export const CategoriesView: React.FC = () => {
                 <label className="block text-xs font-bold text-[#655A7C] mb-1">Teto Mensal Estimado (R$)</label>
                 <input
                   type="number"
-                  required
+                  placeholder="Ex: 500"
                   value={newSubBudget}
                   onChange={e => setNewSubBudget(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-white border border-[#DFD5C3] text-xs font-bold"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-white/90 border border-[#DFD5C3] text-sm font-bold text-[#6E44FF] focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#655A7C] mb-1">Escolha um Ícone Lucide</label>
-                <div className="grid grid-cols-6 gap-2 max-h-36 overflow-y-auto p-2 bg-white rounded-xl border border-[#DFD5C3]">
-                  {AVAILABLE_ICON_NAMES.map(iconName => (
-                    <button
-                      key={iconName}
-                      type="button"
-                      onClick={() => setNewSubIcon(iconName)}
-                      className={`p-2 rounded-lg flex items-center justify-center transition-all ${
-                        newSubIcon === iconName
-                          ? 'bg-[#6E44FF] text-white shadow-sm scale-110'
-                          : 'hover:bg-[#EDE5D5] text-[#231942]'
-                      }`}
-                      title={iconName}
-                    >
-                      <DynamicIcon name={iconName} className="w-4 h-4" />
-                    </button>
-                  ))}
-                </div>
+                <label className="block text-xs font-bold text-[#655A7C] mb-1">Ícone</label>
+                <select
+                  value={newSubIcon}
+                  onChange={e => setNewSubIcon(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-2xl bg-white/90 border border-[#DFD5C3] text-xs font-bold text-[#231942] focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+                >
+                  <option value="Tag">Etiqueta Geral (Tag)</option>
+                  <option value="Home">Casa / Moradia</option>
+                  <option value="Zap">Energia / Luz</option>
+                  <option value="Droplet">Água</option>
+                  <option value="Wifi">Internet / Telefone</option>
+                  <option value="ShoppingBag">Supermercado</option>
+                  <option value="Car">Transporte / Mobilidade</option>
+                  <option value="PawPrint">Pets (Cão e Gato)</option>
+                  <option value="HeartPulse">Saúde / Farmácia</option>
+                  <option value="Tv">Streaming / Assinaturas</option>
+                  <option value="Coffee">Lazer / Restaurantes</option>
+                  <option value="PiggyBank">Reserva / Investimento</option>
+                </select>
               </div>
 
-              <div className="pt-2">
+              <div className="flex gap-2 pt-2">
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-xl bg-[#6E44FF] text-white font-bold text-xs shadow-md hover:bg-[#5A32E6] transition-colors"
+                  className="flex-1 py-3 rounded-2xl bg-[#6E44FF] hover:bg-[#5A32E6] text-white text-xs font-bold shadow-md active:scale-95 transition-all"
                 >
                   Salvar Subcategoria
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsNewSubModalOpen(false)}
+                  className="py-3 px-4 rounded-2xl bg-[#EDE5D5] hover:bg-[#DFD5C3] text-[#231942] text-xs font-bold transition-all"
+                >
+                  Cancelar
                 </button>
               </div>
             </form>

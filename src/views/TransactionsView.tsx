@@ -16,8 +16,11 @@ export const TransactionsView: React.FC = () => {
     pillars, 
     togglePaid, 
     deleteTransaction, 
-    setIsAddModalOpen 
+    setIsAddModalOpen,
+    deviceViewMode,
   } = useFinance();
+
+  const isMobile = deviceViewMode === 'mobile-mockup';
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense' | 'savings' | 'pending'>('all');
@@ -137,8 +140,8 @@ export const TransactionsView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Header & Search Bar */}
-      <div className="bg-[#FCF9F2] p-5 sm:p-6 rounded-[28px] border border-[#DFD5C3] shadow-soft space-y-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] space-y-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:pointer-events-none">
+        <div className={`flex ${isMobile ? 'flex-col items-start' : 'flex-col sm:flex-row items-start sm:items-center'} justify-between gap-4`}>
           <div>
             <h2 className="text-xl font-extrabold text-[#231942]">Extrato Completo</h2>
             <p className="text-xs text-[#655A7C]">Navegue e filtre lançamentos organizados por mês</p>
@@ -146,22 +149,22 @@ export const TransactionsView: React.FC = () => {
 
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="py-2.5 px-4 rounded-2xl bg-[#6E44FF] hover:bg-[#5A32E6] text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition-all"
+            className="py-2.5 px-4 rounded-2xl bg-[#6E44FF] hover:bg-[#5A32E6] text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition-all active:scale-95"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>Novo Lançamento</span>
           </button>
         </div>
 
-        {/* Barra Seletora de Mês/Ano (Item 4) */}
+        {/* Barra Seletora de Mês/Ano */}
         <div className="pt-2">
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
             <button
               onClick={() => setSelectedMonthKey('all')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition-all ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition-all active:scale-95 ${
                 selectedMonthKey === 'all'
                   ? 'bg-[#6E44FF] text-white shadow-md'
-                  : 'bg-[#EDE5D5] text-[#655A7C] hover:text-[#231942] hover:bg-[#DFD5C3]'
+                  : 'bg-[#EDE5D5]/80 text-[#655A7C] hover:text-[#231942] hover:bg-[#DFD5C3]'
               }`}
             >
               Todos os Meses
@@ -170,10 +173,10 @@ export const TransactionsView: React.FC = () => {
               <button
                 key={m.key}
                 onClick={() => setSelectedMonthKey(m.key)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition-all ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition-all active:scale-95 ${
                   selectedMonthKey === m.key
                     ? 'bg-[#6E44FF] text-white shadow-md'
-                    : 'bg-[#EDE5D5] text-[#655A7C] hover:text-[#231942] hover:bg-[#DFD5C3]'
+                    : 'bg-[#EDE5D5]/80 text-[#655A7C] hover:text-[#231942] hover:bg-[#DFD5C3]'
                 }`}
               >
                 {m.label}
@@ -183,7 +186,7 @@ export const TransactionsView: React.FC = () => {
         </div>
 
         {/* Search & Pillar Selector */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-1">
+        <div className={`flex ${isMobile ? 'flex-col' : 'flex-col sm:flex-row'} gap-3 pt-1`}>
           {/* Search Input */}
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-[#655A7C] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -192,7 +195,7 @@ export const TransactionsView: React.FC = () => {
               placeholder="Buscar por descrição ou anotação..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white border border-[#DFD5C3] text-xs font-semibold text-[#231942] focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+              className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white/90 border border-[#DFD5C3] text-xs font-semibold text-[#231942] focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
             />
           </div>
 
@@ -200,7 +203,7 @@ export const TransactionsView: React.FC = () => {
           <select
             value={filterPillar}
             onChange={e => setFilterPillar(e.target.value)}
-            className="px-3 py-2.5 rounded-2xl bg-white border border-[#DFD5C3] text-xs font-bold text-[#231942] focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+            className="px-3 py-2.5 rounded-2xl bg-white/90 border border-[#DFD5C3] text-xs font-bold text-[#231942] focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
           >
             <option value="all">Todos os Pilares</option>
             {pillars.map(p => (
@@ -221,10 +224,10 @@ export const TransactionsView: React.FC = () => {
             <button
               key={btn.id}
               onClick={() => setFilterType(btn.id as any)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95 ${
                 filterType === btn.id
                   ? 'bg-[#231942] text-white shadow-sm'
-                  : 'bg-[#EDE5D5] text-[#655A7C] hover:text-[#231942]'
+                  : 'bg-[#EDE5D5]/80 text-[#655A7C] hover:text-[#231942] hover:bg-[#DFD5C3]'
               }`}
             >
               {btn.label}
@@ -233,10 +236,10 @@ export const TransactionsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Lista Agrupada por Mês com Cabeçalhos Mensais (Item 4) */}
+      {/* Lista Agrupada por Mês com Cabeçalhos Mensais */}
       {groupedByMonth.length === 0 ? (
-        <div className="bg-[#FCF9F2] p-12 rounded-[28px] border border-[#DFD5C3] text-center shadow-soft">
-          <div className="w-14 h-14 rounded-full bg-[#E5DEFF] text-[#6E44FF] flex items-center justify-center mx-auto mb-3">
+        <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-8 sm:p-12 rounded-[28px] border border-white/70 text-center shadow-[0_8px_30px_rgb(35,25,66,0.05)] relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:pointer-events-none">
+          <div className="w-14 h-14 rounded-full bg-[#E5DEFF] text-[#6E44FF] flex items-center justify-center mx-auto mb-3 shadow-sm">
             <Layers className="w-7 h-7" />
           </div>
           <h3 className="text-base font-bold text-[#231942]">Nenhum lançamento registrado</h3>
@@ -245,7 +248,7 @@ export const TransactionsView: React.FC = () => {
           </p>
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="py-2.5 px-5 rounded-2xl bg-[#6E44FF] hover:bg-[#5A32E6] text-white text-xs font-bold shadow-md inline-flex items-center gap-2"
+            className="py-2.5 px-5 rounded-2xl bg-[#6E44FF] hover:bg-[#5A32E6] text-white text-xs font-bold shadow-md inline-flex items-center gap-2 transition-all active:scale-95 hover:shadow-lg hover:-translate-y-0.5"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
             <span>Adicionar Primeiro Lançamento</span>
@@ -256,10 +259,10 @@ export const TransactionsView: React.FC = () => {
           {groupedByMonth.map(group => (
             <div
               key={group.key}
-              className="bg-[#FCF9F2] p-5 sm:p-6 rounded-[28px] border border-[#DFD5C3] shadow-soft space-y-4"
+              className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] space-y-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:pointer-events-none"
             >
               {/* Cabeçalho Mensal com Resumo Financeiro do Mês */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#DFD5C3]">
+              <div className={`flex ${isMobile ? 'flex-col items-start' : 'flex-col sm:flex-row items-start sm:items-center'} justify-between gap-3 pb-3 border-b border-[#DFD5C3]/70`}>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-[#231942] flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-[#6E44FF]" />
@@ -299,12 +302,12 @@ export const TransactionsView: React.FC = () => {
                   return (
                     <div
                       key={tx.id}
-                      className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 rounded-2xl bg-white hover:bg-[#EDE5D5]/40 border border-[#DFD5C3] gap-3 transition-all"
+                      className={`flex ${isMobile ? 'flex-col items-start' : 'flex-col sm:flex-row items-start sm:items-center'} justify-between p-3.5 rounded-2xl bg-white/75 backdrop-blur-md hover:bg-white border border-[#DFD5C3]/70 hover:border-[#6E44FF]/40 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] gap-3 transition-all duration-200`}
                     >
                       {/* Left: Icon & Info */}
                       <div className="flex items-center gap-3 min-w-0">
                         <div
-                          className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-sm"
+                          className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-sm transition-transform group-hover:scale-105"
                           style={{
                             backgroundColor: isIncome ? '#E1F7EF' : isSavings ? '#ECE7FF' : pillar?.softBg || '#E5DEFF',
                             color: isIncome ? '#1F9D73' : isSavings ? '#835FFF' : pillar?.color || '#6E44FF',
@@ -346,7 +349,7 @@ export const TransactionsView: React.FC = () => {
                       </div>
 
                       {/* Right: Amounts & Actions */}
-                      <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-[#DFD5C3]">
+                      <div className={`flex items-center justify-between ${isMobile ? '' : 'sm:justify-end'} gap-3 w-full ${isMobile ? '' : 'sm:w-auto'} pt-2.5 ${isMobile ? '' : 'sm:pt-0'} border-t ${isMobile ? '' : 'sm:border-t-0'} border-[#DFD5C3]/60`}>
                         {!isIncome && (
                           <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${due.bg} ${due.color}`}>
                             {due.text}
@@ -365,7 +368,7 @@ export const TransactionsView: React.FC = () => {
                           {!isIncome && (
                             <button
                               onClick={() => togglePaid(tx.id)}
-                              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 ${
+                              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 active:scale-95 ${
                                 tx.paid
                                   ? 'bg-[#E1F7EF] text-[#1F9D73]'
                                   : 'bg-[#1F9D73] text-white hover:bg-[#18805D] shadow-sm'
@@ -383,7 +386,7 @@ export const TransactionsView: React.FC = () => {
                                 deleteTransaction(tx.id);
                               }
                             }}
-                            className="p-1.5 rounded-xl text-[#655A7C] hover:text-[#E0533C] hover:bg-[#FDE8E5] transition-colors"
+                            className="p-1.5 rounded-xl text-[#655A7C] hover:text-[#E0533C] hover:bg-[#FDE8E5] transition-colors active:scale-95"
                             title="Excluir"
                           >
                             <Trash2 className="w-4 h-4" />

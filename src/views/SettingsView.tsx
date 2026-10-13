@@ -11,7 +11,6 @@ import {
   AlertTriangle,
   Trash2,
   AlertOctagon,
-  RotateCcw,
   PiggyBank
 } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
@@ -25,8 +24,11 @@ export const SettingsView: React.FC = () => {
     lockApp,
     upcomingBills,
     togglePaid,
-    resetAllData
+    resetAllData,
+    deviceViewMode
   } = useFinance();
+
+  const isMobile = deviceViewMode === 'mobile-mockup';
 
   const [userName, setUserName] = useState(settings.userName || '');
   const [userEmail, setUserEmail] = useState(settings.userEmail || '');
@@ -71,16 +73,17 @@ export const SettingsView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="bg-[#FCF9F2] p-5 sm:p-6 rounded-[28px] border border-[#DFD5C3] shadow-soft">
+      <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] transition-all duration-300">
         <h2 className="text-xl font-extrabold text-[#231942]">Configurações & Central de Alertas</h2>
         <p className="text-xs text-[#655A7C]">Personalize notificações push, e-mail, metas e regras de segurança</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Grid: No celular/simulador força 1 coluna estrita (Item 1.2) */}
+      <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'} gap-6`}>
         {/* Card 1: Perfil e Parâmetros Orçamentários */}
-        <div className="bg-[#FCF9F2] p-5 sm:p-6 rounded-[28px] border border-[#DFD5C3] shadow-soft space-y-4">
-          <div className="flex items-center gap-2.5 pb-2 border-b border-[#DFD5C3]">
-            <div className="w-9 h-9 rounded-xl bg-[#E5DEFF] text-[#6E44FF] flex items-center justify-center">
+        <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] hover:border-[#6E44FF]/40 hover:shadow-[0_14px_34px_rgba(110,68,255,0.12)] transition-all duration-300 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:via-transparent before:to-[#6E44FF]/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:pointer-events-none space-y-4 w-full">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-[#DFD5C3]/70 relative z-10">
+            <div className="w-9 h-9 rounded-xl bg-[#E5DEFF] text-[#6E44FF] flex items-center justify-center shrink-0 shadow-sm">
               <User className="w-5 h-5" />
             </div>
             <div>
@@ -89,47 +92,47 @@ export const SettingsView: React.FC = () => {
             </div>
           </div>
 
-          <form onSubmit={handleSaveProfile} className="space-y-3.5">
-            <div>
+          <form onSubmit={handleSaveProfile} className="space-y-3.5 relative z-10">
+            <div className="w-full">
               <label className="block text-xs font-bold text-[#655A7C] mb-1">Seu Nome / Apelido</label>
               <input
                 type="text"
                 placeholder="Ex: Lucas"
                 value={userName}
                 onChange={e => setUserName(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-2xl bg-white border border-[#DFD5C3] text-sm font-semibold text-[#231942] placeholder:text-[#655A7C]/50 focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+                className="w-full px-4 py-2.5 rounded-2xl bg-white/90 border border-[#DFD5C3] text-sm font-semibold text-[#231942] placeholder:text-[#655A7C]/50 focus:outline-none focus:ring-2 focus:ring-[#6E44FF] focus:border-transparent transition-all shadow-inner"
               />
             </div>
 
-            <div>
+            <div className="w-full">
               <label className="block text-xs font-bold text-[#655A7C] mb-1">E-mail para Avisos de Cobrança</label>
               <input
                 type="email"
                 placeholder="Seu e-mail para receber alertas de vencimento"
                 value={userEmail}
                 onChange={e => setUserEmail(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-2xl bg-white border border-[#DFD5C3] text-sm font-semibold text-[#231942] placeholder:text-[#655A7C]/50 focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+                className="w-full px-4 py-2.5 rounded-2xl bg-white/90 border border-[#DFD5C3] text-sm font-semibold text-[#231942] placeholder:text-[#655A7C]/50 focus:outline-none focus:ring-2 focus:ring-[#6E44FF] focus:border-transparent transition-all shadow-inner"
               />
               <span className="text-[11px] text-[#655A7C] mt-1 block">
                 Deixe em branco se preferir usar apenas notificações no app/celular
               </span>
             </div>
 
-            <div>
+            <div className="w-full">
               <label className="block text-xs font-bold text-[#655A7C] mb-1">Teto Mensal Geral do Orçamento (R$)</label>
               <input
                 type="number"
                 placeholder="Ex: 5000"
                 value={budgetCeiling}
                 onChange={e => setBudgetCeiling(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-2xl bg-white border border-[#DFD5C3] text-sm font-bold text-[#6E44FF] placeholder:text-[#655A7C]/50 focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+                className="w-full px-4 py-2.5 rounded-2xl bg-white/90 border border-[#DFD5C3] text-sm font-bold text-[#6E44FF] placeholder:text-[#655A7C]/50 focus:outline-none focus:ring-2 focus:ring-[#6E44FF] focus:border-transparent transition-all shadow-inner"
               />
               <span className="text-[11px] text-[#655A7C] mt-1 block">
                 Usado na barra de progresso FinWise no cabeçalho
               </span>
             </div>
 
-            <div>
+            <div className="w-full">
               <label className="block text-xs font-bold text-[#655A7C] mb-1">Meta da Reserva de Emergência (R$)</label>
               <div className="relative">
                 <input
@@ -137,7 +140,7 @@ export const SettingsView: React.FC = () => {
                   placeholder="Ex: 15000"
                   value={emergencyGoal}
                   onChange={e => setEmergencyGoal(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white border border-[#DFD5C3] text-sm font-bold text-[#1F9D73] placeholder:text-[#655A7C]/50 focus:outline-none focus:ring-2 focus:ring-[#6E44FF]"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white/90 border border-[#DFD5C3] text-sm font-bold text-[#1F9D73] placeholder:text-[#655A7C]/50 focus:outline-none focus:ring-2 focus:ring-[#6E44FF] focus:border-transparent transition-all shadow-inner"
                 />
                 <PiggyBank className="w-4 h-4 text-[#1F9D73] absolute left-3.5 top-3" />
               </div>
@@ -148,7 +151,7 @@ export const SettingsView: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full py-3 rounded-2xl bg-[#6E44FF] hover:bg-[#5A32E6] text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 mt-2"
+              className="w-full py-3 rounded-2xl bg-[#6E44FF] hover:bg-[#5A32E6] active:scale-[0.98] text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 mt-2"
             >
               {savedMessage ? (
                 <>
@@ -163,9 +166,9 @@ export const SettingsView: React.FC = () => {
         </div>
 
         {/* Card 2: Disparo de Alertas & Biometria */}
-        <div className="bg-[#FCF9F2] p-5 sm:p-6 rounded-[28px] border border-[#DFD5C3] shadow-soft space-y-4">
-          <div className="flex items-center gap-2.5 pb-2 border-b border-[#DFD5C3]">
-            <div className="w-9 h-9 rounded-xl bg-[#E1F7EF] text-[#1F9D73] flex items-center justify-center">
+        <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] hover:border-[#6E44FF]/40 hover:shadow-[0_14px_34px_rgba(110,68,255,0.12)] transition-all duration-300 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:via-transparent before:to-[#6E44FF]/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:pointer-events-none space-y-4 w-full">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-[#DFD5C3]/70 relative z-10">
+            <div className="w-9 h-9 rounded-xl bg-[#E1F7EF] text-[#1F9D73] flex items-center justify-center shrink-0 shadow-sm">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
@@ -175,7 +178,7 @@ export const SettingsView: React.FC = () => {
           </div>
 
           {/* Teste Push Nativo */}
-          <div className="p-4 rounded-2xl bg-white border border-[#DFD5C3] space-y-2.5">
+          <div className="p-4 rounded-2xl bg-white/85 backdrop-blur-md border border-[#DFD5C3]/80 space-y-2.5 hover:border-[#6E44FF]/30 transition-all shadow-sm relative z-10">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Smartphone className="w-4 h-4 text-[#6E44FF]" />
@@ -184,11 +187,11 @@ export const SettingsView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => updateSettings({ pushEnabled: !settings.pushEnabled })}
-                className={`w-11 h-6 rounded-full transition-colors relative ${
+                className={`w-11 h-6 rounded-full transition-colors relative active:scale-95 ${
                   settings.pushEnabled ? 'bg-[#6E44FF]' : 'bg-[#DFD5C3]'
                 }`}
               >
-                <div className={`w-5 h-5 rounded-full bg-white transition-transform absolute top-0.5 ${
+                <div className={`w-5 h-5 rounded-full bg-white transition-transform absolute top-0.5 shadow-sm ${
                   settings.pushEnabled ? 'right-0.5' : 'left-0.5'
                 }`} />
               </button>
@@ -201,7 +204,7 @@ export const SettingsView: React.FC = () => {
             <button
               onClick={handleTestPush}
               disabled={isTestingPush}
-              className="w-full py-2.5 px-4 rounded-xl bg-[#EDE5D5] hover:bg-[#DFD5C3] text-[#231942] text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95"
+              className="w-full py-2.5 px-4 rounded-xl bg-[#EDE5D5] hover:bg-[#DFD5C3] text-[#231942] text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
             >
               <Send className="w-3.5 h-3.5 text-[#6E44FF]" />
               <span>{isTestingPush ? 'Enviando...' : 'Testar Notificação Push Nativa'}</span>
@@ -209,7 +212,7 @@ export const SettingsView: React.FC = () => {
           </div>
 
           {/* Bloqueio Biométrico */}
-          <div className="p-4 rounded-2xl bg-white border border-[#DFD5C3] space-y-2.5">
+          <div className="p-4 rounded-2xl bg-white/85 backdrop-blur-md border border-[#DFD5C3]/80 space-y-2.5 hover:border-[#6E44FF]/30 transition-all shadow-sm relative z-10">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Lock className="w-4 h-4 text-[#6E44FF]" />
@@ -233,7 +236,7 @@ export const SettingsView: React.FC = () => {
       </div>
 
       {/* Fila de Lembretes Ativos */}
-      <div className="bg-[#FCF9F2] p-5 sm:p-6 rounded-[28px] border border-[#DFD5C3] shadow-soft">
+      <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] transition-all duration-300">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-base font-bold text-[#231942] flex items-center gap-2">
@@ -260,31 +263,31 @@ export const SettingsView: React.FC = () => {
             {activeReminders.map(bill => (
               <div
                 key={bill.id}
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-white border border-[#DFD5C3]"
+                className="flex items-center justify-between p-3.5 rounded-2xl bg-white/90 backdrop-blur-sm border border-[#DFD5C3] hover:border-[#6E44FF]/40 hover:-translate-y-0.5 hover:shadow-md transition-all active:scale-[0.99]"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#FEF3C7] text-[#D97706] flex items-center justify-center">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-[#FEF3C7] text-[#D97706] flex items-center justify-center shrink-0 shadow-sm">
                     <AlertTriangle className="w-4 h-4" />
                   </div>
-                  <div>
-                    <h4 className="text-xs sm:text-sm font-bold text-[#231942]">{bill.title}</h4>
+                  <div className="min-w-0">
+                    <h4 className="text-xs sm:text-sm font-bold text-[#231942] truncate">{bill.title}</h4>
                     <div className="flex items-center gap-2 text-[11px] text-[#655A7C]">
                       <span>Vence em {formatDateBR(bill.dueDate)}</span>
                       <span>•</span>
-                      <span className="text-[#6E44FF] font-semibold">
+                      <span className="text-[#6E44FF] font-semibold truncate">
                         {bill.notifyPush ? 'Push ' : ''}{bill.notifyEmail ? '+ E-mail' : ''}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="text-xs sm:text-sm font-extrabold text-[#231942]">
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className="text-xs sm:text-sm font-extrabold text-[#231942] whitespace-nowrap">
                     {formatCurrency(bill.amount)}
                   </span>
                   <button
                     onClick={() => togglePaid(bill.id)}
-                    className="px-2.5 py-1 rounded-xl bg-[#1F9D73] text-white text-xs font-bold hover:bg-[#18805D]"
+                    className="px-2.5 py-1 rounded-xl bg-[#1F9D73] hover:bg-[#18805D] text-white text-xs font-bold active:scale-95 transition-all shadow-sm"
                   >
                     Dar Baixa
                   </button>
@@ -296,22 +299,22 @@ export const SettingsView: React.FC = () => {
       </div>
 
       {/* Item 5: Zona de Perigo & Reset de Dados */}
-      <div className="bg-[#FCF9F2] p-5 sm:p-6 rounded-[28px] border border-[#E0533C]/30 shadow-soft space-y-4">
-        <div className="flex items-center gap-2.5 pb-2 border-b border-[#DFD5C3]">
-          <div className="w-9 h-9 rounded-xl bg-[#FDE8E5] text-[#E0533C] flex items-center justify-center">
+      <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-[#E0533C]/40 shadow-[0_8px_30px_rgb(224,83,60,0.06)] space-y-4 transition-all duration-300">
+        <div className="flex items-center gap-2.5 pb-2 border-b border-[#DFD5C3]/70">
+          <div className="w-9 h-9 rounded-xl bg-[#FDE8E5] text-[#E0533C] flex items-center justify-center shrink-0 shadow-sm">
             <AlertOctagon className="w-5 h-5" />
           </div>
           <div>
             <h3 className="text-base font-bold text-[#E0533C]">Zona de Perigo — Gerenciamento de Armazenamento</h3>
-            <p className="text-xs text-[#655A7C]">Limpeza do banco local do aplicativo neste dispositivo</p>
+            <p className="text-xs text-[#655A7C]">Limpeza do banco local e Supabase PostgreSQL</p>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-[#DFD5C3] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="p-4 rounded-2xl bg-white/90 backdrop-blur-sm border border-[#DFD5C3] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <h4 className="text-xs sm:text-sm font-bold text-[#231942]">Resetar todos os dados do App</h4>
             <p className="text-xs text-[#655A7C] max-w-xl">
-              Apaga permanentemente todas as movimentações, categorias criadas, metas orçamentárias e e-mail salvos no armazenamento local (<code className="text-[#6E44FF]">localStorage</code>), retornando o Noctis ao estado inicial 100% limpo.
+              Apaga permanentemente todas as movimentações, categorias criadas, metas orçamentárias e e-mail salvos tanto no banco Supabase quanto no navegador (<code className="text-[#6E44FF]">localStorage</code>), retornando o Noctis ao estado inicial 100% limpo.
             </p>
           </div>
 
@@ -319,7 +322,7 @@ export const SettingsView: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowResetConfirm(true)}
-              className="py-2.5 px-4 rounded-xl bg-[#FDE8E5] hover:bg-[#E0533C] text-[#E0533C] hover:text-white border border-[#E0533C]/40 text-xs font-bold flex items-center gap-2 transition-all shrink-0 active:scale-95"
+              className="py-2.5 px-4 rounded-xl bg-[#FDE8E5] hover:bg-[#E0533C] text-[#E0533C] hover:text-white border border-[#E0533C]/40 text-xs font-bold flex items-center gap-2 transition-all shrink-0 active:scale-95 shadow-sm"
             >
               <Trash2 className="w-4 h-4" />
               <span>Resetar Dados</span>

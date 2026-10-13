@@ -70,11 +70,11 @@ const AppContent: React.FC = () => {
             <div className="w-2 h-2 rounded-full bg-[#6E44FF]/40" />
           </div>
 
-          {/* Scrollable Container */}
-          <div className="flex-1 overflow-y-auto relative no-scrollbar pb-24">
+          {/* Scrollable Container with ample bottom padding for BottomNav */}
+          <div className="flex-1 overflow-y-auto relative no-scrollbar pb-32">
             <Header />
             {/* FinWise Rounded Sheet */}
-            <main className="bg-[#F7F2E7] -mt-5 rounded-t-[36px] pt-6 px-4 min-h-[500px] border-t border-[#DFD5C3]/60">
+            <main className="bg-[#F7F2E7] -mt-5 rounded-t-[36px] pt-6 px-4 min-h-[500px] border-t border-[#DFD5C3]/60 pb-16">
               {renderActiveView()}
             </main>
           </div>
@@ -130,7 +130,7 @@ const AppContent: React.FC = () => {
         </div>
 
         {/* Main Content Body */}
-        <main className={`flex-1 px-4 sm:px-8 py-6 pb-28 lg:pb-12 ${
+        <main className={`flex-1 px-4 sm:px-8 py-6 pb-36 lg:pb-12 ${
           // No mobile, cria o efeito de topo arredondado rounded-t-[36px] sobreposto ao cabeçalho roxo!
           'block lg:block -mt-5 lg:mt-0 rounded-t-[36px] lg:rounded-t-none bg-[#F7F2E7] pt-6 lg:pt-6 border-t lg:border-t-0 border-[#DFD5C3]/60'
         }`}>

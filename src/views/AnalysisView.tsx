@@ -24,8 +24,11 @@ export const AnalysisView: React.FC = () => {
     totalIncome, 
     totalPaidExpenses,
     totalPendingExpenses,
-    setIsAddModalOpen
+    setIsAddModalOpen,
+    deviceViewMode
   } = useFinance();
+
+  const isMobile = deviceViewMode === 'mobile-mockup';
 
   const [activeSubTab, setActiveSubTab] = useState<'charts' | 'calendar'>('charts');
   const [hoveredPillar, setHoveredPillar] = useState<{ id: string; name: string; fullName: string; value: number; color: string } | null>(null);
@@ -44,16 +47,16 @@ export const AnalysisView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Switcher: Gráficos vs Calendário de Vencimentos */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[#FCF9F2] p-4 rounded-[24px] border border-[#DFD5C3]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[#FCF9F2]/75 backdrop-blur-xl p-4 rounded-[24px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] transition-all duration-300">
         <div>
           <h2 className="text-xl font-extrabold text-[#231942]">Análise & Vencimentos</h2>
           <p className="text-xs text-[#655A7C]">Visão gráfica dos 5 Pilares e cronograma financeiro</p>
         </div>
 
-        <div className="flex bg-[#EDE5D5] p-1 rounded-full border border-[#DFD5C3]">
+        <div className="flex bg-[#EDE5D5]/80 backdrop-blur-sm p-1 rounded-full border border-[#DFD5C3]">
           <button
             onClick={() => setActiveSubTab('charts')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full transition-all duration-200 active:scale-95 ${
               activeSubTab === 'charts'
                 ? 'bg-[#6E44FF] text-white shadow-md'
                 : 'text-[#655A7C] hover:text-[#231942]'
@@ -64,7 +67,7 @@ export const AnalysisView: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveSubTab('calendar')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full transition-all duration-200 active:scale-95 ${
               activeSubTab === 'calendar'
                 ? 'bg-[#6E44FF] text-white shadow-md'
                 : 'text-[#655A7C] hover:text-[#231942]'
@@ -79,10 +82,10 @@ export const AnalysisView: React.FC = () => {
       {activeSubTab === 'calendar' ? (
         <CalendarView />
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'} gap-6`}>
           {/* Card 1: Gráfico de Rosca dos 5 Pilares */}
-          <div className="bg-[#FCF9F2] p-5 sm:p-6 rounded-[28px] border border-[#DFD5C3] shadow-soft flex flex-col justify-between">
-            <div className="mb-3">
+          <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] hover:border-[#6E44FF]/40 hover:shadow-[0_14px_34px_rgba(110,68,255,0.12)] transition-all duration-300 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:via-transparent before:to-[#6E44FF]/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:pointer-events-none flex flex-col justify-between">
+            <div className="mb-3 relative z-10">
               <h3 className="text-base font-bold text-[#231942] flex items-center gap-2">
                 <Layers className="w-4 h-4 text-[#6E44FF]" />
                 <span>Distribuição pelos 5 Pilares Macro</span>
@@ -91,7 +94,7 @@ export const AnalysisView: React.FC = () => {
             </div>
 
             {/* Donut Chart Container */}
-            <div className="h-64 sm:h-72 w-full relative flex items-center justify-center">
+            <div className="h-64 sm:h-72 w-full relative flex items-center justify-center relative z-10">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -163,18 +166,18 @@ export const AnalysisView: React.FC = () => {
 
             {/* Custom Legend for 5 Pillars or Empty state */}
             {donutData.length === 0 ? (
-              <div className="py-4 text-center border-t border-[#DFD5C3]">
+              <div className="py-4 text-center border-t border-[#DFD5C3]/60 relative z-10">
                 <p className="text-xs text-[#655A7C]">Nenhum gasto registrado para gerar a distribuição dos pilares.</p>
                 <button
                   onClick={() => setIsAddModalOpen(true)}
-                  className="mt-2 text-xs font-bold text-[#6E44FF] hover:underline inline-flex items-center gap-1"
+                  className="mt-2 text-xs font-bold text-[#6E44FF] hover:underline inline-flex items-center gap-1 active:scale-95 transition-all"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Cadastrar primeiro lançamento</span>
                 </button>
               </div>
             ) : (
-              <div className="space-y-2 mt-2 pt-3 border-t border-[#DFD5C3]">
+              <div className="space-y-1.5 mt-2 pt-3 border-t border-[#DFD5C3]/60 relative z-10">
                 {donutData.map(item => {
                   const pct = totalCommitted > 0 ? Math.round((item.value / totalCommitted) * 100) : 0;
                   return (
@@ -182,15 +185,15 @@ export const AnalysisView: React.FC = () => {
                       key={item.id}
                       onMouseEnter={() => setHoveredPillar(item)}
                       onMouseLeave={() => setHoveredPillar(null)}
-                      className="flex items-center justify-between p-2 rounded-xl hover:bg-[#EDE5D5]/50 transition-colors cursor-pointer"
+                      className="flex items-center justify-between p-2 rounded-xl hover:bg-white/70 transition-colors cursor-pointer active:scale-[0.99]"
                     >
                       <div className="flex items-center gap-2.5">
-                        <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                        <span className="w-3 h-3 rounded-full shrink-0 shadow-sm" style={{ backgroundColor: item.color }} />
                         <span className="text-xs font-bold text-[#231942]">{item.name}</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="text-xs font-bold text-[#231942]">{formatCurrency(item.value)}</span>
-                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#EDE5D5] text-[#655A7C] min-w-[42px] text-center">
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#EDE5D5]/80 text-[#655A7C] min-w-[42px] text-center">
                           {pct}%
                         </span>
                       </div>
@@ -202,8 +205,8 @@ export const AnalysisView: React.FC = () => {
           </div>
 
           {/* Card 2: Comparativo Mensal Entradas vs Saídas */}
-          <div className="bg-[#FCF9F2] p-5 sm:p-6 rounded-[28px] border border-[#DFD5C3] shadow-soft flex flex-col justify-between">
-            <div>
+          <div className="bg-[#FCF9F2]/75 backdrop-blur-xl p-5 sm:p-6 rounded-[28px] border border-white/70 shadow-[0_8px_30px_rgb(35,25,66,0.05)] hover:border-[#6E44FF]/40 hover:shadow-[0_14px_34px_rgba(110,68,255,0.12)] transition-all duration-300 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:via-transparent before:to-[#6E44FF]/5 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:pointer-events-none flex flex-col justify-between">
+            <div className="relative z-10">
               <div className="flex items-center justify-between mb-2">
                 <div>
                   <h3 className="text-base font-bold text-[#231942]">Entradas vs Saídas por Mês</h3>
@@ -213,65 +216,68 @@ export const AnalysisView: React.FC = () => {
 
               {/* Mini Summary badges */}
               <div className="grid grid-cols-2 gap-3 mb-4 mt-2">
-                <div className="p-3 rounded-2xl bg-[#E1F7EF] border border-[#1F9D73]/20 flex items-center justify-between">
+                <div className="p-3 rounded-2xl bg-[#E1F7EF]/80 backdrop-blur-sm border border-[#1F9D73]/25 flex items-center justify-between shadow-sm">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#1F9D73]">
                     <ArrowUpRight className="w-4 h-4" />
                     <span>Entradas Totais</span>
                   </div>
-                  <span className="text-xs font-extrabold text-[#1F9D73]">{formatCurrency(totalIncome)}</span>
+                  <span className="text-xs font-extrabold text-[#1F9D73] whitespace-nowrap">{formatCurrency(totalIncome)}</span>
                 </div>
-                <div className="p-3 rounded-2xl bg-[#FDE8E5] border border-[#E0533C]/20 flex items-center justify-between">
+                <div className="p-3 rounded-2xl bg-[#FDE8E5]/80 backdrop-blur-sm border border-[#E0533C]/25 flex items-center justify-between shadow-sm">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#E0533C]">
                     <ArrowDownRight className="w-4 h-4" />
                     <span>Saídas Totais</span>
                   </div>
-                  <span className="text-xs font-extrabold text-[#E0533C]">{formatCurrency(totalPaidExpenses)}</span>
+                  <span className="text-xs font-extrabold text-[#E0533C] whitespace-nowrap">{formatCurrency(totalPaidExpenses)}</span>
                 </div>
               </div>
             </div>
 
             {/* Bar Chart Container / Empty State */}
-            {monthlyHistory.length === 0 ? (
-              <div className="h-64 sm:h-72 w-full flex flex-col items-center justify-center text-center p-6 bg-[#EDE5D5]/30 rounded-2xl border border-dashed border-[#DFD5C3]">
-                <BarChart3 className="w-10 h-10 text-[#655A7C]/50 mb-2" />
-                <p className="text-sm font-bold text-[#231942]">Nenhum histórico mensal registrado</p>
-                <p className="text-xs text-[#655A7C] max-w-xs mt-1">
-                  Conforme você cadastrar seus lançamentos e receitas, o comparativo mensal será traçado automaticamente aqui.
-                </p>
-              </div>
-            ) : (
-              <div className="h-64 sm:h-72 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={monthlyHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#DFD5C3" opacity={0.6} />
-                    <XAxis dataKey="month" tick={{ fill: '#655A7C', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fill: '#655A7C', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000}k`} />
-                    <Tooltip
-                      formatter={(val: any) => [formatCurrency(Number(val) || 0)]}
-                      contentStyle={{
-                        backgroundColor: '#FCF9F2',
-                        border: '1px solid #DFD5C3',
-                        borderRadius: '16px',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        color: '#231942',
-                      }}
-                    />
-                    <Bar dataKey="income" name="Entradas" fill="#1F9D73" radius={[6, 6, 0, 0]} maxBarSize={28} />
-                    <Bar dataKey="expense" name="Saídas" fill="#6E44FF" radius={[6, 6, 0, 0]} maxBarSize={28} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            )}
+            <div className="relative z-10">
+              {monthlyHistory.length === 0 ? (
+                <div className="h-64 sm:h-72 w-full flex flex-col items-center justify-center text-center p-6 bg-white/50 rounded-2xl border border-dashed border-[#DFD5C3]">
+                  <BarChart3 className="w-10 h-10 text-[#655A7C]/50 mb-2" />
+                  <p className="text-sm font-bold text-[#231942]">Nenhum histórico mensal registrado</p>
+                  <p className="text-xs text-[#655A7C] max-w-xs mt-1">
+                    Conforme você cadastrar seus lançamentos e receitas, o comparativo mensal será traçado automaticamente aqui.
+                  </p>
+                </div>
+              ) : (
+                <div className="h-64 sm:h-72 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={monthlyHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#DFD5C3" opacity={0.6} />
+                      <XAxis dataKey="month" tick={{ fill: '#655A7C', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fill: '#655A7C', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000}k`} />
+                      <Tooltip
+                        formatter={(val: any) => [formatCurrency(Number(val) || 0)]}
+                        contentStyle={{
+                          backgroundColor: '#FCF9F2',
+                          border: '1px solid #DFD5C3',
+                          borderRadius: '16px',
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#231942',
+                          boxShadow: '0 8px 30px rgba(35,25,66,0.1)',
+                        }}
+                      />
+                      <Bar dataKey="income" name="Entradas" fill="#1F9D73" radius={[6, 6, 0, 0]} maxBarSize={28} />
+                      <Bar dataKey="expense" name="Saídas" fill="#6E44FF" radius={[6, 6, 0, 0]} maxBarSize={28} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
 
             {/* Bar Chart Legend */}
-            <div className="flex items-center justify-center gap-6 pt-3 border-t border-[#DFD5C3] text-xs font-bold text-[#655A7C]">
+            <div className="flex items-center justify-center gap-6 pt-3 border-t border-[#DFD5C3]/60 text-xs font-bold text-[#655A7C] relative z-10">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded bg-[#1F9D73]" />
+                <span className="w-3 h-3 rounded bg-[#1F9D73] shadow-sm" />
                 <span>Entradas (Receitas)</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded bg-[#6E44FF]" />
+                <span className="w-3 h-3 rounded bg-[#6E44FF] shadow-sm" />
                 <span>Saídas (Despesas)</span>
               </div>
             </div>

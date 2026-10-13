@@ -98,8 +98,8 @@ export const AddTransactionModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#231942]/60 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-[#FCF9F2] w-full max-w-lg rounded-[32px] border border-[#DFD5C3] shadow-2xl p-6 sm:p-7 relative my-8 animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#231942]/65 backdrop-blur-md overflow-y-auto">
+      <div className="bg-[#FCF9F2]/95 backdrop-blur-2xl w-full max-w-lg rounded-[32px] border border-white/80 shadow-[0_20px_60px_rgba(35,25,66,0.3)] p-6 sm:p-7 relative my-8 animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-[#DFD5C3]">
           <div>
