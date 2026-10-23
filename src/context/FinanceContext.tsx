@@ -8,8 +8,6 @@ import {
   UserSettings, 
   MonthlyComparison,
   SyncStatus,
-  TransactionType,
-  RecurrenceType
 } from '../types/finance';
 import { 
   MACRO_PILLARS, 
@@ -19,7 +17,14 @@ import {
   DEFAULT_USER_SETTINGS,
 } from '../data/mockData';
 import { triggerPaymentConfetti } from '../utils/formatters';
-import { supabase, DBSubcategory, DBTransaction, DBUserSettings } from '../lib/supabase';
+import { mapDBSubcategory, mapDBTransaction } from '../utils/mappers';
+import {
+  calculateMonthlyHistory,
+  calculateFinanceTotals,
+  calculatePillarExpenses,
+  calculatePillarBudgets,
+} from '../utils/calculations';
+import { supabase, DBSubcategory, DBUserSettings } from '../lib/supabase';
 
 interface FinanceContextType {
   pillars: MacroPillar[];
@@ -104,39 +109,7 @@ const LEGACY_STORAGE_KEYS = [
   'noctis_is_locked_v2',
 ];
 
-// Funções de mapeamento DB <-> App
-function mapDBSubcategory(row: DBSubcategory): SubCategory {
-  return {
-    id: row.id,
-    name: row.name,
-    pillarId: (row.macro_pillar as MacroPillarId) || 'fixed',
-    iconName: row.icon || 'Tag',
-    monthlyBudget: Number(row.monthly_limit || 0),
-  };
-}
-
-function mapDBTransaction(row: DBTransaction): Transaction {
-  return {
-    id: row.id,
-    title: row.title,
-    notes: row.notes || undefined,
-    amount: Number(row.amount || 0),
-    type: (row.type as TransactionType) || 'expense',
-    pillarId: (row.macro_pillar && row.macro_pillar !== 'income') ? (row.macro_pillar as MacroPillarId) : undefined,
-    subCategoryId: row.subcategory_id || '',
-    recurrence: (row.recurrence as RecurrenceType) || 'single',
-    currentInstallment: row.installment_current ?? undefined,
-    totalInstallments: row.installment_total ?? undefined,
-    dueDate: row.due_date || (row.created_at ? row.created_at.split('T')[0] : new Date().toISOString().split('T')[0]),
-    paid: Boolean(row.is_paid),
-    paidDate: row.paid_at || undefined,
-    notifyEnabled: Boolean(row.notify_push || row.notify_email),
-    notifyPush: Boolean(row.notify_push),
-    notifyEmail: Boolean(row.notify_email),
-    createdAt: row.created_at || new Date().toISOString(),
-  };
-}
-
+// Funções de mapeamento DB <-> App importadas de ../utils/mappers
 export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Limpeza de chaves legadas de rascunhos antigos
   useEffect(() => {
@@ -370,117 +343,35 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Histórico Mensal Calculado Dinamicamente
   const monthlyHistory: MonthlyComparison[] = useMemo(() => {
-    if (transactions.length === 0) {
-      return [];
-    }
-    
-    const monthMap: Record<string, { income: number; expense: number; savings: number }> = {};
-    const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-    
-    transactions.forEach(t => {
-      const date = t.dueDate || t.createdAt;
-      if (!date) return;
-      const [y, m] = date.split('-');
-      if (!y || !m) return;
-      const key = `${y}-${m}`;
-      if (!monthMap[key]) {
-        monthMap[key] = { income: 0, expense: 0, savings: 0 };
-      }
-      if (t.type === 'income') {
-        monthMap[key].income += t.amount;
-      } else if (t.type === 'savings') {
-        monthMap[key].savings += t.amount;
-      } else {
-        monthMap[key].expense += t.amount;
-      }
-    });
-
-    const sortedKeys = Object.keys(monthMap).sort();
-    return sortedKeys.map(key => {
-      const [, mStr] = key.split('-');
-      const mIdx = parseInt(mStr, 10) - 1;
-      const name = monthNames[mIdx] || key;
-      return {
-        month: name,
-        monthKey: key,
-        income: monthMap[key].income,
-        expense: monthMap[key].expense,
-        savings: monthMap[key].savings,
-      };
-    });
+    return calculateMonthlyHistory(transactions);
   }, [transactions]);
 
   // Métricas calculadas
-  const totalIncome = useMemo(() => {
-    return transactions
-      .filter(t => t.type === 'income')
-      .reduce((sum, t) => sum + t.amount, 0);
-  }, [transactions]);
+  const financeTotals = useMemo(() => {
+    return calculateFinanceTotals(transactions, settings.monthlyBudgetCeiling || 0);
+  }, [transactions, settings.monthlyBudgetCeiling]);
 
-  const totalPaidExpenses = useMemo(() => {
-    return transactions
-      .filter(t => t.type === 'expense' && t.paid)
-      .reduce((sum, t) => sum + t.amount, 0);
-  }, [transactions]);
-
-  const totalPendingExpenses = useMemo(() => {
-    return transactions
-      .filter(t => t.type === 'expense' && !t.paid)
-      .reduce((sum, t) => sum + t.amount, 0);
-  }, [transactions]);
-
-  const totalSaved = useMemo(() => {
-    return transactions
-      .filter(t => t.type === 'savings')
-      .reduce((sum, t) => sum + t.amount, 0);
-  }, [transactions]);
-
-  const realFreeSavings = useMemo(() => {
-    return totalIncome - totalPaidExpenses - totalPendingExpenses - totalSaved;
-  }, [totalIncome, totalPaidExpenses, totalPendingExpenses, totalSaved]);
+  const {
+    totalIncome,
+    totalPaidExpenses,
+    totalPendingExpenses,
+    totalSaved,
+    realFreeSavings,
+    budgetUsedPercentage,
+  } = financeTotals;
 
   const budgetLimit = settings.monthlyBudgetCeiling || 0;
-
-  const budgetUsedPercentage = useMemo(() => {
-    if (budgetLimit <= 0) return 0;
-    const committed = totalPaidExpenses + totalPendingExpenses + totalSaved;
-    return Math.min(Math.round((committed / budgetLimit) * 100), 100);
-  }, [totalPaidExpenses, totalPendingExpenses, totalSaved, budgetLimit]);
 
   const unreadNotificationsCount = useMemo(() => {
     return notifications.filter(n => !n.read).length;
   }, [notifications]);
 
   const pillarExpenses = useMemo(() => {
-    const expenses: Record<MacroPillarId, number> = {
-      fixed: 0,
-      debts: 0,
-      routine: 0,
-      lifestyle: 0,
-      wealth: 0,
-    };
-    transactions.forEach(t => {
-      if (t.pillarId && expenses[t.pillarId] !== undefined) {
-        expenses[t.pillarId] += t.amount;
-      }
-    });
-    return expenses;
+    return calculatePillarExpenses(transactions);
   }, [transactions]);
 
   const pillarBudgets = useMemo(() => {
-    const budgets: Record<MacroPillarId, number> = {
-      fixed: 0,
-      debts: 0,
-      routine: 0,
-      lifestyle: 0,
-      wealth: 0,
-    };
-    subcategories.forEach(s => {
-      if (budgets[s.pillarId] !== undefined) {
-        budgets[s.pillarId] += s.monthlyBudget;
-      }
-    });
-    return budgets;
+    return calculatePillarBudgets(subcategories);
   }, [subcategories]);
 
   const upcomingBills = useMemo(() => {
