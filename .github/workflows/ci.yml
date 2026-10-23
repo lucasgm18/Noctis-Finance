@@ -8,7 +8,7 @@ on:
 
 jobs:
   ci:
-    name: Lint, Typecheck & Build
+    name: Lint, Typecheck, Test & Build
     runs-on: ubuntu-latest
 
     steps:
@@ -26,6 +26,9 @@ jobs:
 
       - name: Run linter (Oxlint)
         run: npm run lint
+
+      - name: Run unit tests (Vitest)
+        run: npm test
 
       - name: Run typecheck and build (tsc + vite)
         run: npm run build
